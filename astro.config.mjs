@@ -7,5 +7,6 @@ export default defineConfig({
   vite: {
     plugins: [tailwind()]
   },
-  output: 'static'        // ← Important for static sites
+  output: 'static',           // Important for Vercel
+  trailingSlash: 'never'
 });
