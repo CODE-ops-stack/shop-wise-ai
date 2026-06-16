@@ -2,18 +2,14 @@
   "name": "shopwise-ai",
   "type": "module",
   "version": "0.0.1",
-  
-"engines": {
-  "node": "20.x"
-},
-    "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+  "engines": {
+    "node": "20.x"
   },
-
+  "scripts": {
+    "dev": "node ./node_modules/astro/bin/astro.mjs dev",
+    "build": "node ./node_modules/astro/bin/astro.mjs build",
+    "preview": "node ./node_modules/astro/bin/astro.mjs preview"
+  },
   "dependencies": {
     "@astrojs/svelte": "^8.1.2",
     "@astrojs/vercel": "^10.0.8",
