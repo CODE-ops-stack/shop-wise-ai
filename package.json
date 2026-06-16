@@ -8,7 +8,7 @@
     "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "npx astro build",
+    "build": "node ./node_modules/astro/astro.js build",
     "preview": "astro preview",
     "astro": "astro"
   },
