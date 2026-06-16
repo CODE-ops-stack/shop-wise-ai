@@ -2,9 +2,10 @@
   "name": "shopwise-ai",
   "type": "module",
   "version": "0.0.1",
-  "engines": {
-    "node": ">=18.17.0"
-  },
+  
+"engines": {
+  "node": "20.x"
+},
     "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
