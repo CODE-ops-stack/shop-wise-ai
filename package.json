@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "node ./node_modules/astro/bin/astro.mjs dev",
     "build": "node ./node_modules/astro/bin/astro.mjs build",
-    "preview": "node ./node_modules/astro/bin/astro.mjs preview"
+    "vercel-build": "node ./node_modules/astro/bin/astro.mjs build",
+    "preview": "node ./node_modules/astro/bin/astro.mjs preview",
+    "postinstall": "node scripts/postinstall.mjs"
   },
   "dependencies": {
     "@astrojs/svelte": "^8.1.2",

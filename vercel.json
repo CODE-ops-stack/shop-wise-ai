@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
   "installCommand": "npm ci --prefer-offline --no-audit --no-fund",
-  "buildCommand": "npm run build"
+  "buildCommand": "node ./node_modules/astro/bin/astro.mjs build"
 }
