@@ -2,10 +2,11 @@
   import PreferencePanel from '../preferences/PreferencePanel.svelte';
   import ProductResultsBlock from '../products/ProductResultsBlock.svelte';
   import { analyzeQuery, panelSummary, resolvePreferences } from '../../../lib/preferences/analyzer';
-  import { generatePlaceholderResults } from '../../../lib/products/placeholder';
-  import type { AnalyzeResponse } from '../../../types/api';
+  import type { AnalyzeResponse, SearchErrorResponse, SearchResponse } from '../../../types/api';
   import type { ChatMessage } from '../../../types/chat';
   import { createMessageId } from '../../../types/chat';
+  import { mergeQuickFiltersIntoPreferences } from '../../../lib/products/visible-filters';
+  import type { QuickFilterId } from '../../../lib/products/visible-filters';
   import type { FilledSlots, QueryAnalysis, ResolvedPreferences } from '../../../types/preferences';
 
   let messages = $state<ChatMessage[]>([]);
@@ -13,6 +14,7 @@
   let isAnalyzing = $state(false);
   let isEnhancing = $state(false);
   let isSearching = $state(false);
+  let refiningMessageId = $state<string | null>(null);
 
   const hasPendingPanel = $derived(
     messages.some((m) => m.type === 'preference_panel' && m.status === 'pending'),
@@ -118,25 +120,95 @@
     }
   }
 
-  async function showProductResults(preferences: ResolvedPreferences) {
-    isSearching = true;
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      const results = generatePlaceholderResults(preferences);
+  async function showProductResults(
+    preferences: ResolvedPreferences,
+    options?: { replaceMessageId?: string },
+  ) {
+    const isReplace = Boolean(options?.replaceMessageId);
+    if (isReplace) {
+      refiningMessageId = options?.replaceMessageId ?? null;
+    } else {
+      isSearching = true;
+    }
 
-      messages = [
-        ...messages,
-        {
-          id: createMessageId(),
-          role: 'assistant',
-          type: 'product_results',
-          results,
-          timestamp: Date.now(),
-        },
-      ];
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ preferences }),
+      });
+
+      if (!response.ok) {
+        const errorBody = (await response.json().catch(() => ({}))) as SearchErrorResponse;
+        if (!isReplace) {
+          messages = [
+            ...messages,
+            {
+              id: createMessageId(),
+              role: 'assistant',
+              type: 'text',
+              content:
+                errorBody.error ??
+                'Could not fetch product recommendations right now. Please try again.',
+              timestamp: Date.now(),
+            },
+          ];
+        }
+        return;
+      }
+
+      const data = (await response.json()) as SearchResponse;
+
+      if (isReplace && options?.replaceMessageId) {
+        messages = messages.map((message) =>
+          message.id === options.replaceMessageId && message.type === 'product_results'
+            ? {
+                ...message,
+                results: data.results,
+                preferences,
+                timestamp: Date.now(),
+              }
+            : message,
+        );
+      } else {
+        messages = [
+          ...messages,
+          {
+            id: createMessageId(),
+            role: 'assistant',
+            type: 'product_results',
+            results: data.results,
+            preferences,
+            timestamp: Date.now(),
+          },
+        ];
+      }
+    } catch {
+      if (!isReplace) {
+        messages = [
+          ...messages,
+          {
+            id: createMessageId(),
+            role: 'assistant',
+            type: 'text',
+            content: 'Product search failed. Check your connection and try again.',
+            timestamp: Date.now(),
+          },
+        ];
+      }
     } finally {
       isSearching = false;
+      refiningMessageId = null;
     }
+  }
+
+  function handleQuickFilterRefine(
+    messageId: string,
+    basePreferences: ResolvedPreferences,
+    selections: Partial<Record<QuickFilterId, string>>,
+  ) {
+    const merged = mergeQuickFiltersIntoPreferences(basePreferences, selections);
+    void showProductResults(merged, { replaceMessageId: messageId });
   }
 
   async function handleSubmit() {
@@ -295,7 +367,13 @@
       {:else if message.type === 'product_results'}
         <div class="flex justify-start">
           <div class="w-full">
-            <ProductResultsBlock results={message.results} />
+            <ProductResultsBlock
+              results={message.results}
+              preferences={message.preferences}
+              isRefining={refiningMessageId === message.id}
+              onrefine={(selections) =>
+                handleQuickFilterRefine(message.id, message.preferences, selections)}
+            />
           </div>
         </div>
       {/if}
@@ -328,7 +406,7 @@
         <div class="rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-200/80">
           <div class="flex items-center gap-2">
             <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-500"></span>
-            <span class="text-sm text-slate-500">Finding best matches…</span>
+            <span class="text-sm text-slate-500">Finding products with AI…</span>
           </div>
         </div>
       </div>

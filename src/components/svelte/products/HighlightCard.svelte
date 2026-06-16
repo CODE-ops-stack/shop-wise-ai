@@ -54,4 +54,13 @@
       </span>
     {/each}
   </div>
+
+  <a
+    href={product.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="mt-3 block rounded-lg bg-slate-900 px-3 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800"
+  >
+    View on {marketplace.label}
+  </a>
 </article>

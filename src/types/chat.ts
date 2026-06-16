@@ -30,6 +30,7 @@ export type ChatMessage =
       role: 'assistant';
       type: 'product_results';
       results: ProductResultsPayload;
+      preferences: ResolvedPreferences;
       timestamp: number;
     };
 

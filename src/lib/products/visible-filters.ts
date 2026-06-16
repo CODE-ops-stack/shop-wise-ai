@@ -1,5 +1,5 @@
 import { clothingConfig } from '../../../config/categories/clothing';
-import type { FilledSlots } from '../../types/preferences';
+import type { FilledSlots, ResolvedPreferences } from '../../types/preferences';
 import type { KnownFilters } from '../../types/products';
 
 export type QuickFilterId = 'size' | 'color' | 'fabric' | 'price';
@@ -16,17 +16,6 @@ const QUICK_FILTERS: QuickFilterConfig[] = [
   { id: 'fabric', label: 'Fabric', fieldId: 'fabric' },
   { id: 'price', label: 'Price Range', fieldId: 'budget' },
 ];
-
-function slotIsKnown(slots: FilledSlots, fieldId: string): boolean {
-  const value = slots[fieldId];
-  if (value === undefined || value === null) return false;
-  if (typeof value === 'string') return value.trim().length > 0;
-  if (Array.isArray(value)) return value.length > 0;
-  if (typeof value === 'object') {
-    return value.min !== undefined || value.max !== undefined;
-  }
-  return false;
-}
 
 export function buildKnownFilters(slots: FilledSlots): KnownFilters {
   const known: KnownFilters = {};
@@ -66,4 +55,38 @@ export function getFilterOptions(filterId: QuickFilterId): { value: string; labe
   return field.options.map((option) =>
     typeof option === 'string' ? { value: option, label: option } : option,
   );
+}
+
+/** Convert quick filter chip selections into preference slots. */
+export function quickFilterSelectionsToSlots(
+  selections: Partial<Record<QuickFilterId, string>>,
+): FilledSlots {
+  const slots: FilledSlots = {};
+
+  if (selections.size) slots.size = selections.size;
+
+  if (selections.color) slots.color = [selections.color];
+
+  if (selections.fabric) slots.fabric = [selections.fabric];
+
+  if (selections.price) {
+    const [min, max] = selections.price.split('-').map(Number);
+    if (!Number.isNaN(min) && !Number.isNaN(max)) {
+      slots.budget = { min, max };
+    }
+  }
+
+  return slots;
+}
+
+export function mergeQuickFiltersIntoPreferences(
+  base: ResolvedPreferences,
+  selections: Partial<Record<QuickFilterId, string>>,
+): ResolvedPreferences {
+  const extraSlots = quickFilterSelectionsToSlots(selections);
+
+  return {
+    ...base,
+    slots: { ...base.slots, ...extraSlots },
+  };
 }
