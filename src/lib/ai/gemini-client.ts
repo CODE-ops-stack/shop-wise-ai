@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI, type ResponseSchema } from '@google/generative-ai';
+import { GEMINI_API_KEY } from 'astro:env/server';
 import { APP_CONFIG } from '../../../config/app';
 import { QUERY_ANALYSIS_GEMINI_SCHEMA } from './gemini-schema';
 
@@ -23,8 +24,12 @@ export interface StructuredJsonRequest<T> {
 
 let client: GoogleGenerativeAI | null = null;
 
+function getApiKey(): string | undefined {
+  return GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
+}
+
 function getClient(): GoogleGenerativeAI {
-  const apiKey = import.meta.env.GEMINI_API_KEY;
+  const apiKey = getApiKey();
   if (!apiKey) {
     throw new GeminiError('GEMINI_API_KEY is not configured', 'MISSING_API_KEY');
   }
@@ -107,5 +112,5 @@ export async function generateStructuredJson<T>({
 }
 
 export function isGeminiConfigured(): boolean {
-  return Boolean(import.meta.env.GEMINI_API_KEY);
+  return Boolean(getApiKey());
 }

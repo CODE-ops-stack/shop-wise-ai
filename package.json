@@ -3,18 +3,16 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": "24.x"
+    "node": ">=18.17.0"
   },
   "scripts": {
-  "dev": "astro dev",
-  "build": "astro build",
-  "preview": "astro preview",
-  "astro": "astro",
-   "vercel-build": "chmod +x node_modules/.bin/astro && astro build"
-},
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
   "dependencies": {
-    "@astrojs/node": "^10.1.4",
     "@astrojs/svelte": "^8.1.2",
+    "@astrojs/vercel": "^10.0.8",
     "@google/generative-ai": "^0.24.1",
     "@tailwindcss/vite": "^4.3.1",
     "astro": "^6.4.7",
