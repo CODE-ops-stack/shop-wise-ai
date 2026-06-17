@@ -9,6 +9,8 @@ export const clothingConfig: CategoryConfig = {
     'tshirt',
     'kurta',
     'kurti',
+    'pyjama',
+    'pajama',
     'dress',
     'jeans',
     'trouser',
@@ -35,7 +37,8 @@ export const clothingConfig: CategoryConfig = {
     'wear',
   ],
   subcategories: {
-    topwear: ['shirt', 't-shirt', 'tshirt', 'kurta', 'kurti', 'top', 'blouse', 'hoodie', 'sweater'],
+    topwear: ['shirt', 't-shirt', 'tshirt', 'kurta', 'kurti', 'pyjama', 'pajama', 'top', 'blouse', 'hoodie', 'sweater'],
+    ethnic: ['kurta', 'kurti', 'pyjama', 'pajama', 'saree', 'sari', 'lehenga'],
     bottomwear: ['jeans', 'trouser', 'pant', 'pants', 'shorts', 'skirt'],
     dresswear: ['dress', 'saree', 'sari', 'lehenga', 'gown'],
     outerwear: ['jacket', 'coat'],

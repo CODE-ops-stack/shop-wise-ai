@@ -50,10 +50,12 @@ const FABRIC_KEYWORDS: Record<string, string[]> = {
 const SIZE_PATTERN = /\b(XXL|XL|XS|[SML])\b/i;
 
 const GENDER_KEYWORDS: Record<string, string[]> = {
+  women: ['women', "women's", 'womens', 'woman', 'female', 'girl', 'girls', 'ladies', 'lady'],
   men: ['men', "men's", 'mens', 'male', 'boy', 'boys'],
-  women: ['women', "women's", 'womens', 'female', 'girl', 'girls', 'ladies', 'lady'],
   unisex: ['unisex'],
 };
+
+const BUDGET_IN_PATTERN = /\bin\s*(?:rs\.?|₹|inr)?\s*(\d[\d,]*)/i;
 
 const SLEEVELESS_KEYWORDS = {
   yes: ['sleeveless', 'without sleeves', 'no sleeves'],
@@ -131,19 +133,30 @@ export function detectSubcategory(
   return undefined;
 }
 
+function keywordMatches(query: string, keyword: string): boolean {
+  const pattern = new RegExp(
+    `\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`,
+    'i',
+  );
+  return pattern.test(normalizeQuery(query));
+}
+
 function matchKeywordMap(
   query: string,
   map: Record<string, string[]>,
 ): string | undefined {
-  const normalized = normalizeQuery(query);
-
   for (const [value, keywords] of Object.entries(map)) {
-    if (keywords.some((keyword) => normalized.includes(keyword))) {
+    if (keywords.some((keyword) => keywordMatches(query, keyword))) {
       return value;
     }
   }
 
   return undefined;
+}
+
+/** Women is checked before men so "women" never matches the men keyword. */
+export function extractGender(query: string): string | undefined {
+  return matchKeywordMap(query, GENDER_KEYWORDS);
 }
 
 function matchKeywordMapMulti(
@@ -182,6 +195,11 @@ export function extractBudget(query: string): BudgetRange | undefined {
     return { max: amount };
   }
 
+  const inMatch = query.match(BUDGET_IN_PATTERN);
+  if (inMatch) {
+    return { max: parseAmount(inMatch[1]) };
+  }
+
   return undefined;
 }
 
@@ -207,7 +225,7 @@ export function extractFilledSlotsFromQuery(
   const fabrics = matchKeywordMapMulti(query, FABRIC_KEYWORDS);
   if (fabrics.length) slots.fabric = fabrics;
 
-  const gender = matchKeywordMap(query, GENDER_KEYWORDS);
+  const gender = extractGender(query);
   if (gender) slots.gender = gender;
 
   if (SLEEVELESS_KEYWORDS.yes.some((k) => query.toLowerCase().includes(k))) {

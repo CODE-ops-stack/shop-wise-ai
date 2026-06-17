@@ -22,6 +22,16 @@ export default defineConfig({
         access: 'secret',
         optional: true,
       }),
+      GOOGLE_CSE_API_KEY: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      GOOGLE_CSE_CX: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
     },
   },
 });

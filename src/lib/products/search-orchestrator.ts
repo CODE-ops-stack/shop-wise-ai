@@ -5,7 +5,10 @@ import {
   PRODUCT_SEARCH_SYSTEM_PROMPT,
 } from '../../../prompts/search-products';
 import { PRODUCT_SEARCH_GEMINI_SCHEMA } from '../ai/gemini-schema-products';
+import { generateGroundedJson } from '../ai/gemini-grounded-search';
 import { generateStructuredJson, GeminiError } from '../ai/gemini-client';
+import { enrichProductImages } from './image-resolver';
+import { resolveExactProductUrls } from './product-url-resolver';
 import type { ResolvedPreferences } from '../../types/preferences';
 import type { ProductResultsPayload, SearchCursor } from '../../types/products';
 import {
@@ -34,28 +37,55 @@ export class ProductSearchError extends Error {
   }
 }
 
+async function fetchGeminiProducts(
+  preferences: ResolvedPreferences,
+  cursor: SearchCursor,
+) {
+  const userPrompt = buildProductSearchUserPrompt(preferences, {
+    page: cursor.page,
+    seenUrls: cursor.seenUrls,
+    seenTitleKeys: cursor.seenTitleKeys,
+  });
+  const temperature = cursor.page === 0 ? 0.25 : 0.3;
+
+  try {
+    const { data } = await generateGroundedJson<unknown>({
+      systemPrompt: PRODUCT_SEARCH_SYSTEM_PROMPT,
+      userPrompt,
+      temperature,
+      timeoutMs: APP_CONFIG.searchTimeoutMs,
+    });
+    return parseGeminiProductSearchResult(data);
+  } catch {
+    const data = await generateStructuredJson<unknown>({
+      systemPrompt: PRODUCT_SEARCH_SYSTEM_PROMPT,
+      userPrompt,
+      schema: PRODUCT_SEARCH_GEMINI_SCHEMA,
+      temperature,
+      timeoutMs: APP_CONFIG.searchTimeoutMs,
+    });
+    return parseGeminiProductSearchResult(data);
+  }
+}
+
 async function fetchRankedBatch(
   preferences: ResolvedPreferences,
   cursor: SearchCursor,
 ) {
-  const raw = await generateStructuredJson({
-    systemPrompt: PRODUCT_SEARCH_SYSTEM_PROMPT,
-    userPrompt: buildProductSearchUserPrompt(preferences, {
-      page: cursor.page,
-      seenUrls: cursor.seenUrls,
-      seenTitleKeys: cursor.seenTitleKeys,
-    }),
-    schema: PRODUCT_SEARCH_GEMINI_SCHEMA,
-    temperature: cursor.page === 0 ? 0.35 : 0.4,
-    timeoutMs: APP_CONFIG.searchTimeoutMs,
-  });
-
-  const parsed = parseGeminiProductSearchResult(raw);
+  const parsed = await fetchGeminiProducts(preferences, cursor);
   if (!parsed?.products.length) {
     throw new ProductSearchError('No products returned from Gemini', 'NO_RESULTS');
   }
 
-  const ranked = rankProducts(parsed.products, preferences.slots, {
+  const withExactUrls = await resolveExactProductUrls(parsed.products, preferences.slots);
+  if (!withExactUrls.length) {
+    throw new ProductSearchError(
+      'No products with verified product-page URLs. Add GOOGLE_CSE_API_KEY + GOOGLE_CSE_CX to .env for reliable links.',
+      'NO_RESULTS',
+    );
+  }
+
+  const ranked = rankProducts(withExactUrls, preferences.slots, {
     page: cursor.page,
     seenUrls: new Set(cursor.seenUrls),
     seenTitleKeys: new Set(cursor.seenTitleKeys),
@@ -95,13 +125,8 @@ export async function searchProducts(
     let bestOverallId: string | null = null;
     let bestValueId: string | null = null;
 
-    const flagged = ranked.map((product) => {
-      if (!isFirstPage) {
-        return stripInternalScores(product);
-      }
-
-      return stripInternalScores(product);
-    });
+    let flagged = ranked.map((product) => stripInternalScores(product));
+    flagged = await enrichProductImages(flagged);
 
     if (isFirstPage) {
       const bestOverall = pickBestOverall(ranked);

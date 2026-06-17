@@ -100,30 +100,25 @@
 </script>
 
 <section class="w-full space-y-4">
-  <div class="rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm">
-    <p class="text-sm font-semibold text-slate-900">
-      {totalShown} products found
+  <div class="glass-panel-elevated rounded-2xl px-5 py-4">
+    <div class="flex items-baseline justify-between gap-2">
+      <p class="text-base font-bold text-text">
+        <span class="text-gradient-pink">{totalShown}</span>
+        <span class="text-text-muted"> products found</span>
+      </p>
       {#if isRefining}
-        <span class="ml-2 text-xs font-normal text-indigo-600">Updating…</span>
+        <span class="text-xs font-medium text-pink animate-pulse">Updating…</span>
       {/if}
-    </p>
-    <p class="text-xs text-slate-500">
+    </div>
+    <p class="mt-1 text-xs text-text-subtle">
       Ranked: exact match → best price → Myntra, AJIO, Nykaa Fashion, Amazon, Flipkart
     </p>
   </div>
 
   {#if bestOverall && bestValue && results.bestOverallId}
-    <div class="grid gap-3 sm:grid-cols-2">
-      <HighlightCard
-        product={bestOverall}
-        label="Best Overall Match"
-        badgeClass="bg-violet-100 text-violet-700"
-      />
-      <HighlightCard
-        product={bestValue}
-        label="Best Value Pick"
-        badgeClass="bg-amber-100 text-amber-700"
-      />
+    <div class="grid gap-4 sm:grid-cols-2">
+      <HighlightCard product={bestOverall} label="Best Overall Match" variant="overall" />
+      <HighlightCard product={bestValue} label="Best Value Pick" variant="value" />
     </div>
   {/if}
 
@@ -133,7 +128,7 @@
     onrefine={onrefine}
   />
 
-  <div class="grid grid-cols-2 gap-3 sm:grid-cols-2">
+  <div class="grid grid-cols-2 gap-3 sm:gap-4">
     {#each gridProducts as product (product.id)}
       <ProductCard {product} />
     {/each}
@@ -142,24 +137,27 @@
   {#if hasMore || isLoadingMore}
     <div
       bind:this={sentinel}
-      class="flex items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 py-6"
+      class="flex items-center justify-center rounded-2xl border border-dashed border-pink/20 bg-pink/5 py-8"
     >
       {#if isLoadingMore}
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></span>
-          <span class="text-sm text-slate-500">Loading more products…</span>
+        <div class="flex items-center gap-3">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-pink opacity-50"></span>
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-pink"></span>
+          </span>
+          <span class="text-sm text-text-muted">Loading more products…</span>
         </div>
       {:else}
-        <span class="text-xs text-slate-400">Scroll for more</span>
+        <span class="text-xs text-text-subtle">Scroll for more</span>
       {/if}
     </div>
   {/if}
 
   {#if loadError}
-    <p class="text-center text-xs text-red-500">{loadError}</p>
+    <p class="text-center text-xs text-pink">{loadError}</p>
   {/if}
 
   {#if !hasMore && totalShown > 0 && !isLoadingMore}
-    <p class="text-center text-xs text-slate-400">You've seen all matching products.</p>
+    <p class="text-center text-xs text-text-subtle">You've seen all matching products.</p>
   {/if}
 </section>

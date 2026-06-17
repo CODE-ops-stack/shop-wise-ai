@@ -1,16 +1,27 @@
 <script lang="ts">
   import { getMarketplace } from '../../../../config/marketplaces';
   import type { Product } from '../../../types/products';
+  import ProductImage from './ProductImage.svelte';
 
   interface Props {
     product: Product;
     label: string;
-    badgeClass: string;
+    variant: 'overall' | 'value';
   }
 
-  let { product, label, badgeClass }: Props = $props();
+  let { product, label, variant }: Props = $props();
 
   const marketplace = $derived(getMarketplace(product.marketplace));
+
+  const badgeClass = $derived(
+    variant === 'overall'
+      ? 'bg-gradient-to-r from-pink/25 to-pink-deep/25 text-pink ring-pink/40'
+      : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-300 ring-amber-500/30',
+  );
+
+  const borderGlow = $derived(
+    variant === 'overall' ? 'ring-pink/20' : 'ring-amber-500/15',
+  );
 
   function formatPrice(price: number): string {
     return new Intl.NumberFormat('en-IN', {
@@ -21,35 +32,49 @@
   }
 </script>
 
-<article class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
+<article
+  class="glass-panel-elevated rounded-2xl p-4 ring-1 {borderGlow} transition hover:ring-pink/35"
+>
   <div class="mb-3 flex items-center justify-between gap-2">
-    <span class="rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide {badgeClass}">
+    <span
+      class="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ring-1 {badgeClass}"
+    >
       {label}
     </span>
-    <span class="text-xs font-medium text-slate-500">{marketplace.label}</span>
+    <span class="text-xs font-medium text-text-subtle">{marketplace.label}</span>
   </div>
 
-  <h3 class="line-clamp-2 text-sm font-semibold text-slate-900">{product.title}</h3>
+  <ProductImage
+    title={product.title}
+    imageUrl={product.imageUrl}
+    productUrl={product.url}
+    marketplaceLabel={marketplace.label}
+    tall
+  />
+
+  <h3 class="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-text">{product.title}</h3>
 
   <div class="mt-2 flex items-baseline gap-2">
-    <span class="text-lg font-bold text-slate-900">{formatPrice(product.price)}</span>
+    <span class="text-xl font-bold text-text">{formatPrice(product.price)}</span>
     {#if product.originalPrice}
-      <span class="text-xs text-slate-400 line-through">{formatPrice(product.originalPrice)}</span>
+      <span class="text-sm text-text-subtle line-through">{formatPrice(product.originalPrice)}</span>
     {/if}
   </div>
 
   {#if product.rating}
-    <p class="mt-1 text-xs text-slate-500">
-      ★ {product.rating.toFixed(1)}
+    <p class="mt-1.5 text-xs text-text-muted">
+      <span class="text-amber-400">★</span> {product.rating.toFixed(1)}
       {#if product.reviewCount}
-        · {product.reviewCount.toLocaleString('en-IN')} reviews
+        <span class="text-text-subtle"> · {product.reviewCount.toLocaleString('en-IN')} reviews</span>
       {/if}
     </p>
   {/if}
 
   <div class="mt-3 flex flex-wrap gap-1.5">
     {#each product.highlights.slice(0, 2) as highlight}
-      <span class="rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600 ring-1 ring-slate-200">
+      <span
+        class="rounded-full bg-white/5 px-2.5 py-1 text-[10px] font-medium text-text-muted ring-1 ring-white/8"
+      >
         {highlight}
       </span>
     {/each}
@@ -59,8 +84,8 @@
     href={product.url}
     target="_blank"
     rel="noopener noreferrer"
-    class="mt-3 block rounded-lg bg-slate-900 px-3 py-2 text-center text-xs font-semibold text-white transition hover:bg-slate-800"
+    class="mt-4 block rounded-xl bg-gradient-to-r from-pink to-pink-deep px-4 py-3 text-center text-xs font-bold text-white shadow-lg shadow-pink/25 transition hover:brightness-110"
   >
-    View on {marketplace.label}
+    Open exact product on {marketplace.label}
   </a>
 </article>

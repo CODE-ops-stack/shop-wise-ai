@@ -9,17 +9,24 @@ const { title = 'ShopWise AI' } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="Smart shopping assistant for India — find the right product fast." />
+		<meta name="description" content="Premium smart shopping assistant for India — find the right product fast." />
+		<meta name="theme-color" content="#0a0a0a" />
 		<title>{title}</title>
 	</head>
-	<body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
+	<body class="min-h-screen antialiased">
 		<slot />
 	</body>
 </html>

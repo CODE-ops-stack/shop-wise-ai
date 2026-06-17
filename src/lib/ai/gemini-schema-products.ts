@@ -31,7 +31,12 @@ export const PRODUCT_SEARCH_GEMINI_SCHEMA: ResponseSchema = {
           },
           url: {
             type: SchemaType.STRING,
-            description: 'Direct HTTPS product URL on the stated marketplace domain.',
+            description: 'Exact HTTPS product detail page URL (not a search URL).',
+          },
+          imageUrl: {
+            type: SchemaType.STRING,
+            description: 'Direct HTTPS product image URL from the listing.',
+            nullable: true,
           },
           rating: {
             type: SchemaType.NUMBER,

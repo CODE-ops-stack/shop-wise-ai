@@ -2,7 +2,8 @@ import { APP_CONFIG } from '../../../config/app';
 import { getMarketplacePriority, type MarketplaceId } from '../../../config/marketplaces';
 import type { GeminiRawProduct } from '../../../prompts/search-products';
 import type { Product } from '../../types/products';
-import { normalizeProductUrl, resolveMarketplaceFromProduct } from './marketplace-filter';
+import { resolveMarketplaceFromProduct, titleMatchesRequestedGender } from './marketplace-filter';
+import { isProductPageUrl, isValidImageUrl, normalizeProductUrl } from './product-url';
 
 const STOP_WORDS = new Set([
   'a', 'an', 'the', 'for', 'and', 'or', 'with', 'in', 'on', 'of', 'by',
@@ -40,11 +41,15 @@ export function rawToProduct(
   raw: GeminiRawProduct,
   index: number,
   page = 0,
+  slots: Record<string, unknown> = {},
 ): Product | null {
   const marketplace = resolveMarketplaceFromProduct(raw);
   if (!marketplace) return null;
 
   if (raw.price <= 0 || raw.price > 100_000) return null;
+
+  const productUrl = normalizeProductUrl(raw.url);
+  if (!isProductPageUrl(productUrl, marketplace)) return null;
 
   return {
     id: `product_p${page}_${index}_${marketplace}_${raw.price}`,
@@ -53,7 +58,9 @@ export function rawToProduct(
     originalPrice:
       raw.originalPrice && raw.originalPrice > raw.price ? raw.originalPrice : undefined,
     marketplace,
-    url: normalizeProductUrl(raw.url),
+    url: productUrl,
+    imageUrl:
+      raw.imageUrl && isValidImageUrl(raw.imageUrl) ? raw.imageUrl.trim() : undefined,
     rating: raw.rating ? Math.min(5, Math.max(1, raw.rating)) : undefined,
     reviewCount: raw.reviewCount ? Math.max(0, Math.round(raw.reviewCount)) : undefined,
     highlights: raw.highlights.length ? raw.highlights : ['Verified marketplace'],
@@ -91,9 +98,15 @@ export function rankProducts(
   const validated: ScoredProduct[] = [];
 
   for (let i = 0; i < rawProducts.length; i += 1) {
-    const product = rawToProduct(rawProducts[i], i, page);
+    const product = rawToProduct(rawProducts[i], i, page, slots);
     if (!product) continue;
     if (!withinBudget(product.price, slots)) continue;
+    if (
+      typeof slots.gender === 'string' &&
+      !titleMatchesRequestedGender(product.title, slots.gender)
+    ) {
+      continue;
+    }
     if (seenUrls.has(product.url)) continue;
 
     const titleKey = normalizeTitleKey(product.title);

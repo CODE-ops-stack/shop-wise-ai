@@ -3,7 +3,6 @@
     BudgetRange,
     FilledSlots,
     PreferencePanel,
-    SlotValue,
   } from '../../../types/preferences';
 
   interface Props {
@@ -61,28 +60,36 @@
     );
   }
 
+  function chipClass(active: boolean): string {
+    return active
+      ? 'border-pink bg-pink/20 text-pink ring-1 ring-pink/40 shadow-sm shadow-pink/10'
+      : 'border-white/10 bg-surface text-text-muted hover:border-pink/30 hover:bg-surface-hover hover:text-text';
+  }
+
   function handleSubmit() {
     onsubmit?.(selections);
   }
 </script>
 
-<div class="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-  <div class="mb-4">
-    <h3 class="text-sm font-semibold text-slate-900">{panel.title}</h3>
+<div class="glass-panel-elevated rounded-2xl p-5">
+  <div class="mb-5 border-b border-white/6 pb-4">
+    <h3 class="text-base font-semibold text-text">{panel.title}</h3>
     {#if panel.subtitle}
-      <p class="mt-1 text-xs text-slate-500">{panel.subtitle}</p>
+      <p class="mt-1.5 text-xs leading-relaxed text-text-muted">{panel.subtitle}</p>
     {/if}
   </div>
 
-  <div class="space-y-4">
+  <div class="space-y-5">
     {#each panel.fields as field (field.id)}
       <div>
-        <div class="mb-2 flex items-center gap-2">
-          <span class="text-xs font-medium uppercase tracking-wide text-slate-600">
+        <div class="mb-2.5 flex items-center gap-2">
+          <span class="text-[11px] font-semibold uppercase tracking-widest text-text-subtle">
             {field.config.label}
           </span>
           {#if field.reason === 'required'}
-            <span class="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+            <span
+              class="rounded-full bg-pink/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-pink"
+            >
               Needed
             </span>
           {/if}
@@ -93,10 +100,9 @@
             {#each field.config.presets as preset (preset.label)}
               <button
                 type="button"
-                class="rounded-full border px-3 py-1.5 text-xs font-medium transition
-                  {budgetIsActive(preset)
-                  ? 'border-indigo-600 bg-indigo-600 text-white'
-                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-indigo-300'}"
+                class="rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-200 {chipClass(
+                  budgetIsActive(preset),
+                )}"
                 {disabled}
                 onclick={() => setBudget({ min: preset.min, max: preset.max })}
               >
@@ -109,10 +115,9 @@
             {#each getOptions(field.id) as option (option.value)}
               <button
                 type="button"
-                class="rounded-full border px-3 py-1.5 text-xs font-medium transition
-                  {isSelected(field.id, option.value)
-                  ? 'border-indigo-600 bg-indigo-600 text-white'
-                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-indigo-300'}"
+                class="rounded-full border px-3.5 py-2 text-xs font-medium transition-all duration-200 {chipClass(
+                  isSelected(field.id, option.value),
+                )}"
                 {disabled}
                 onclick={() => toggleCheckbox(field.id, option.value, field.config.multi)}
               >
@@ -125,10 +130,10 @@
     {/each}
   </div>
 
-  <div class="mt-5 flex items-center gap-2">
+  <div class="mt-6 flex items-center gap-3 border-t border-white/6 pt-5">
     <button
       type="button"
-      class="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+      class="flex-1 rounded-xl bg-gradient-to-r from-pink to-pink-deep px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-pink/20 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
       {disabled}
       onclick={handleSubmit}
     >
@@ -137,7 +142,7 @@
     {#if onskip}
       <button
         type="button"
-        class="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 transition hover:text-slate-800 disabled:opacity-50"
+        class="rounded-xl px-4 py-3 text-sm font-medium text-text-subtle transition hover:text-text disabled:opacity-40"
         {disabled}
         onclick={onskip}
       >
