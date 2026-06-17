@@ -32,11 +32,15 @@ export interface ProductResultsPayload {
   cursor: string | null;
   hasMore: boolean;
   totalShown: number;
+  /** True when this payload is a pagination batch (not the first page). */
+  isLoadMore?: boolean;
 }
 
 export interface SearchCursor {
   page: number;
   seenUrls: string[];
+  seenTitleKeys: string[];
   searchIntent: string;
   preferenceHash: string;
+  totalLoaded: number;
 }

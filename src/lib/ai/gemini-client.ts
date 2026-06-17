@@ -53,6 +53,28 @@ function parseJsonResponse<T>(text: string): T {
   }
 }
 
+function extractApiErrorMessage(error: unknown): string {
+  if (!(error instanceof Error)) return 'Gemini API request failed';
+
+  const message = error.message;
+
+  if (message.includes('429') || message.toLowerCase().includes('quota')) {
+    return 'Gemini rate limit reached. Wait 30–60 seconds and try again.';
+  }
+  if (message.includes('403') || message.toLowerCase().includes('api key')) {
+    return 'Gemini API key is invalid or lacks permission.';
+  }
+  if (message.includes('404')) {
+    return `Gemini model "${APP_CONFIG.geminiModel}" is not available for your API key.`;
+  }
+
+  return message.split('\n')[0] || 'Gemini API request failed';
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -75,6 +97,34 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
  * Reusable structured JSON generation via Gemini.
  * Uses responseMimeType + responseSchema for reliable parsing.
  */
+async function callGemini<T>(
+  systemPrompt: string,
+  userPrompt: string,
+  schema: ResponseSchema,
+  temperature: number,
+  timeoutMs: number,
+): Promise<T> {
+  const genAI = getClient();
+  const model = genAI.getGenerativeModel({
+    model: APP_CONFIG.geminiModel,
+    systemInstruction: systemPrompt,
+    generationConfig: {
+      temperature,
+      responseMimeType: 'application/json',
+      responseSchema: schema,
+    },
+  });
+
+  const result = await withTimeout(model.generateContent(userPrompt), timeoutMs);
+  const text = result.response.text();
+
+  if (!text) {
+    throw new GeminiError('Gemini returned an empty response', 'API_ERROR');
+  }
+
+  return parseJsonResponse<T>(text);
+}
+
 export async function generateStructuredJson<T>({
   systemPrompt,
   userPrompt,
@@ -83,31 +133,24 @@ export async function generateStructuredJson<T>({
   timeoutMs = APP_CONFIG.analyzeTimeoutMs,
 }: StructuredJsonRequest<T>): Promise<T> {
   try {
-    const genAI = getClient();
-    const model = genAI.getGenerativeModel({
-      model: APP_CONFIG.geminiModel,
-      systemInstruction: systemPrompt,
-      generationConfig: {
-        temperature,
-        responseMimeType: 'application/json',
-        responseSchema: schema,
-      },
-    });
-
-    const result = await withTimeout(
-      model.generateContent(userPrompt),
-      timeoutMs,
-    );
-
-    const text = result.response.text();
-    if (!text) {
-      throw new GeminiError('Gemini returned an empty response', 'API_ERROR');
-    }
-
-    return parseJsonResponse<T>(text);
+    return await callGemini<T>(systemPrompt, userPrompt, schema, temperature, timeoutMs);
   } catch (error) {
     if (error instanceof GeminiError) throw error;
-    throw new GeminiError('Gemini API request failed', 'API_ERROR', error);
+
+    const message = extractApiErrorMessage(error);
+    const isRateLimit = message.toLowerCase().includes('rate limit');
+
+    if (isRateLimit) {
+      await sleep(35_000);
+      try {
+        return await callGemini<T>(systemPrompt, userPrompt, schema, temperature, timeoutMs);
+      } catch (retryError) {
+        if (retryError instanceof GeminiError) throw retryError;
+        throw new GeminiError(extractApiErrorMessage(retryError), 'API_ERROR', retryError);
+      }
+    }
+
+    throw new GeminiError(message, 'API_ERROR', error);
   }
 }
 

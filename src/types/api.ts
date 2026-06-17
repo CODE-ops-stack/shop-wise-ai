@@ -13,6 +13,7 @@ export interface AnalyzeResponse {
 
 export interface SearchRequest {
   preferences: ResolvedPreferences;
+  cursor?: string | null;
 }
 
 export interface SearchResponse {

@@ -41,22 +41,43 @@ Strict rules:
 - Respect budget constraints strictly — do not recommend products above max budget.
 - Output strict JSON only. No markdown.`;
 
-export function buildProductSearchUserPrompt(preferences: ResolvedPreferences): string {
+export interface ProductSearchPromptContext {
+  page: number;
+  seenUrls?: string[];
+  seenTitleKeys?: string[];
+}
+
+export function buildProductSearchUserPrompt(
+  preferences: ResolvedPreferences,
+  context: ProductSearchPromptContext = { page: 0 },
+): string {
   const marketplaces = getMarketplacesForCategory('clothing')
     .filter((m) => CLOTHING_MARKETPLACE_IDS.includes(m.id))
     .map((m) => `${m.label} (${m.domain}, id: ${m.id})`)
     .join(', ');
+
+  const excludeSection =
+    context.page > 0 && (context.seenUrls?.length || context.seenTitleKeys?.length)
+      ? `
+Already shown to the user — do NOT repeat these (different URL and meaningfully different title required):
+${context.seenUrls?.length ? `URLs: ${context.seenUrls.slice(-30).join(', ')}` : ''}
+${context.seenTitleKeys?.length ? `Similar titles already shown: ${context.seenTitleKeys.slice(-20).join(', ')}` : ''}
+
+This is page ${context.page + 1} — return the NEXT best 12 products not listed above.`
+      : '';
 
   return `Find clothing product recommendations for an Indian shopper.
 
 Search intent: "${preferences.searchIntent}"
 Category: ${preferences.categoryId}
 Subcategory: ${preferences.subcategory ?? 'general clothing'}
+Result page: ${context.page + 1}
 
 User preferences (JSON):
 ${JSON.stringify(preferences.slots, null, 2)}
 
 Allowed marketplaces (use exact id in response): ${marketplaces}
+${excludeSection}
 
 Instructions:
 1. Return up to 12 products ranked by match quality internally.
@@ -66,6 +87,7 @@ Instructions:
 5. URLs must be plausible product page URLs on the correct marketplace domain.
 6. Spread products across multiple marketplaces when quality is similar — prefer Myntra/AJIO for fashion.
 7. If budget max is set, all prices must be <= that max.
+8. Return diverse brands/styles — avoid near-duplicate titles.
 
 Return JSON with a "products" array.`;
 }

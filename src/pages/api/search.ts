@@ -3,8 +3,7 @@ import {
   ProductSearchError,
   searchProducts,
 } from '../../lib/products/search-orchestrator';
-import type { SearchResponse } from '../../types/api';
-import type { ResolvedPreferences } from '../../types/preferences';
+import type { SearchRequest, SearchResponse } from '../../types/api';
 
 export const prerender = false;
 
@@ -20,14 +19,14 @@ function jsonResponse(body: unknown, status = 200): Response {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = (await request.json()) as { preferences?: ResolvedPreferences };
+    const body = (await request.json()) as SearchRequest;
     const preferences = body.preferences;
 
     if (!preferences?.searchIntent || !preferences.categoryId) {
       return jsonResponse({ error: 'Valid preferences are required' }, 400);
     }
 
-    const results = await searchProducts(preferences);
+    const results = await searchProducts(preferences, body.cursor ?? null);
 
     const response: SearchResponse = {
       results,
@@ -38,7 +37,13 @@ export const POST: APIRoute = async ({ request }) => {
   } catch (error) {
     if (error instanceof ProductSearchError) {
       const status =
-        error.code === 'GEMINI_UNAVAILABLE' ? 503 : error.code === 'NO_RESULTS' ? 404 : 500;
+        error.code === 'GEMINI_UNAVAILABLE'
+          ? 503
+          : error.code === 'NO_RESULTS'
+            ? 404
+            : error.code === 'INVALID_CURSOR'
+              ? 400
+              : 500;
       return jsonResponse({ error: error.message, code: error.code }, status);
     }
 

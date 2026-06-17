@@ -20,4 +20,8 @@ Thumbs.db
 # Tooling
 agent-tools/
 .vercel
-.env*
+
+
+
+
+.env.local

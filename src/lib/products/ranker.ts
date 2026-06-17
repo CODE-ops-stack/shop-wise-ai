@@ -30,14 +30,24 @@ function withinBudget(price: number, slots: Record<string, unknown>): boolean {
   return true;
 }
 
-export function rawToProduct(raw: GeminiRawProduct, index: number): Product | null {
+export interface RankOptions {
+  page?: number;
+  seenUrls?: Set<string>;
+  seenTitleKeys?: Set<string>;
+}
+
+export function rawToProduct(
+  raw: GeminiRawProduct,
+  index: number,
+  page = 0,
+): Product | null {
   const marketplace = resolveMarketplaceFromProduct(raw);
   if (!marketplace) return null;
 
   if (raw.price <= 0 || raw.price > 100_000) return null;
 
   return {
-    id: `product_${index}_${marketplace}_${raw.price}`,
+    id: `product_p${page}_${index}_${marketplace}_${raw.price}`,
     title: raw.title.trim(),
     price: raw.price,
     originalPrice:
@@ -73,13 +83,22 @@ function compareRanked(a: ScoredProduct, b: ScoredProduct): number {
 export function rankProducts(
   rawProducts: GeminiRawProduct[],
   slots: Record<string, unknown>,
+  options: RankOptions = {},
 ): ScoredProduct[] {
+  const page = options.page ?? 0;
+  const seenUrls = options.seenUrls ?? new Set<string>();
+  const seenTitleKeys = options.seenTitleKeys ?? new Set<string>();
   const validated: ScoredProduct[] = [];
 
   for (let i = 0; i < rawProducts.length; i += 1) {
-    const product = rawToProduct(rawProducts[i], i);
+    const product = rawToProduct(rawProducts[i], i, page);
     if (!product) continue;
     if (!withinBudget(product.price, slots)) continue;
+    if (seenUrls.has(product.url)) continue;
+
+    const titleKey = normalizeTitleKey(product.title);
+    if (titleKey && seenTitleKeys.has(titleKey)) continue;
+
     validated.push(product as ScoredProduct);
   }
 
