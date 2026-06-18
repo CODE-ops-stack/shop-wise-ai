@@ -378,12 +378,12 @@
 
 <svelte:window onkeydown={onGlobalKeydown} />
 
-<div class="relative mx-auto flex min-h-screen max-w-3xl flex-col px-4 pb-6 pt-5 sm:px-6">
+<div class="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col px-4 pb-6 pt-5 sm:px-6">
   <!-- Header -->
-  <header class="glass-panel-elevated neon-border scan-line mb-5 rounded-2xl px-5 py-4 animate-fade-in">
+  <header class="glass-panel-elevated neon-border scan-line mb-5 rounded-2xl px-5 py-4 animate-fashion-pop">
     <div class="flex items-center gap-3">
       <div
-        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink via-magenta to-violet pink-glow animate-float"
+        class="logo-burst flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink via-magenta to-violet pink-glow animate-glow-pulse animate-float"
       >
         <svg class="h-5 w-5 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -417,9 +417,9 @@
   >
     {#if messages.length === 0}
       <div
-        class="glass-panel neon-border card-hover-lift rounded-2xl border-dashed border-pink/25 p-6 sm:p-8 text-center animate-slide-up"
+        class="fashion-hero-burst glass-panel neon-border card-hover-lift rounded-2xl border-dashed border-pink/25 p-6 sm:p-8 text-center animate-fashion-pop"
       >
-        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink/20 to-violet/20 ring-1 ring-pink/30 neon-glow animate-float">
+        <div class="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink/20 to-violet/20 ring-1 ring-pink/30 neon-glow animate-bounce-in animate-glow-pulse">
           <svg class="h-7 w-7 text-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
@@ -428,10 +428,11 @@
         <p class="mt-2 text-sm text-text-muted">Tap a suggestion or type your own query</p>
 
         <div class="mt-5 flex flex-wrap justify-center gap-2">
-          {#each EXAMPLE_PROMPTS as prompt}
+          {#each EXAMPLE_PROMPTS as prompt, i}
             <button
               type="button"
-              class="card-hover-lift rounded-full border border-white/10 bg-surface/60 px-3.5 py-2 text-left text-xs font-medium text-text-muted transition hover:border-pink/40 hover:bg-pink/10 hover:text-text"
+              class="fashion-chip card-hover-lift rounded-full border border-white/10 bg-surface/60 px-3.5 py-2 text-left text-xs font-medium text-text-muted transition hover:border-pink/40 hover:bg-pink/10 hover:text-text animate-slide-up"
+              style="animation-delay: {120 + i * 70}ms"
               onclick={() => useExamplePrompt(prompt)}
             >
               {prompt}
@@ -484,7 +485,7 @@
     {#each messages as message (message.id)}
       {#if message.type === 'text'}
         <div
-          class="flex animate-slide-up {message.role === 'user' ? 'justify-end' : 'justify-start'}"
+          class="flex animate-fashion-pop {message.role === 'user' ? 'justify-end' : 'justify-start'}"
         >
           <div
             class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed

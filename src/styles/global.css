@@ -77,7 +77,7 @@
       radial-gradient(ellipse 45% 35% at 0% 80%, rgb(34 211 238 / 0.12), transparent 50%),
       radial-gradient(ellipse 60% 50% at 80% 90%, rgb(233 30 99 / 0.15), transparent 55%),
       #050508;
-    animation: aurora-shift 14s ease-in-out infinite alternate;
+    animation: aurora-shift 10s ease-in-out infinite alternate;
   }
 
   .futuristic-bg::after {
@@ -183,6 +183,8 @@
   }
 
   .btn-neon {
+    position: relative;
+    overflow: hidden;
     background: linear-gradient(135deg, #ff2d92 0%, #d946ef 50%, #e91e63 100%);
     background-size: 200% auto;
     box-shadow:
@@ -191,12 +193,25 @@
     transition: all 0.3s ease;
   }
 
+  .btn-neon::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
   .btn-neon:hover:not(:disabled) {
     background-position: right center;
     box-shadow:
       0 0 36px rgb(255 45 146 / 0.6),
       0 0 80px rgb(217 70 239 / 0.25);
     transform: translateY(-1px);
+  }
+
+  .btn-neon:hover:not(:disabled)::after {
+    transform: translateX(100%);
   }
 
   .chip-neon-active {
@@ -256,16 +271,262 @@
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
+
+  .animate-fashion-pop {
+    animation: fashion-pop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .animate-sparkle-spin {
+    animation: sparkle-spin 8s linear infinite;
+  }
+
+  .fashion-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1), box-shadow 0.4s ease;
+  }
+
+  .fashion-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgb(255 255 255 / 0.08) 45%,
+      rgb(255 45 146 / 0.12) 50%,
+      transparent 65%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.65s ease;
+    pointer-events: none;
+  }
+
+  .fashion-card:hover::after {
+    transform: translateX(120%);
+  }
+
+  .fashion-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow:
+      0 16px 48px rgb(0 0 0 / 0.55),
+      0 0 48px rgb(255 45 146 / 0.18),
+      0 0 80px rgb(139 92 246 / 0.1);
+  }
+
+  .fashion-chip {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+
+  .fashion-chip:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 0 24px rgb(255 45 146 / 0.25);
+  }
+
+  .fashion-chip:active {
+    transform: scale(0.97);
+  }
+
+  .fashion-hero-burst {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fashion-hero-burst::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 120%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle,
+      rgb(255 45 146 / 0.15) 0%,
+      rgb(139 92 246 / 0.08) 35%,
+      transparent 65%
+    );
+    animation: hero-burst 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .logo-burst {
+    position: relative;
+  }
+
+  .logo-burst::before {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from 0deg,
+      #ff2d92,
+      #d946ef,
+      #22d3ee,
+      #8b5cf6,
+      #ff2d92
+    );
+    animation: logo-spin 4s linear infinite;
+    opacity: 0.55;
+    z-index: -1;
+    filter: blur(6px);
+  }
+
+  /* Floating ambient layer */
+  .fashion-ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .fashion-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    animation: orb-drift 18s ease-in-out infinite;
+  }
+
+  .fashion-orb-1 {
+    width: 280px;
+    height: 280px;
+    top: 8%;
+    left: -5%;
+    background: rgb(255 45 146 / 0.35);
+    animation-duration: 22s;
+  }
+
+  .fashion-orb-2 {
+    width: 220px;
+    height: 220px;
+    top: 55%;
+    right: -8%;
+    background: rgb(139 92 246 / 0.3);
+    animation-duration: 19s;
+    animation-delay: -4s;
+  }
+
+  .fashion-orb-3 {
+    width: 180px;
+    height: 180px;
+    bottom: 12%;
+    left: 20%;
+    background: rgb(34 211 238 / 0.22);
+    animation-duration: 16s;
+    animation-delay: -8s;
+  }
+
+  .fashion-orb-4 {
+    width: 140px;
+    height: 140px;
+    top: 30%;
+    right: 25%;
+    background: rgb(233 30 99 / 0.28);
+    animation-duration: 14s;
+    animation-delay: -2s;
+  }
+
+  .fashion-sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgb(255 45 146 / 0.8);
+    animation: sparkle-twinkle 3s ease-in-out infinite;
+  }
+
+  .fashion-sparkle::before,
+  .fashion-sparkle::after {
+    content: "";
+    position: absolute;
+    background: rgb(255 255 255 / 0.9);
+  }
+
+  .fashion-sparkle::before {
+    width: 1px;
+    height: 14px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .fashion-sparkle::after {
+    width: 14px;
+    height: 1px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .fashion-sparkle-1 { top: 15%; left: 12%; animation-delay: 0s; }
+  .fashion-sparkle-2 { top: 28%; right: 18%; animation-delay: 0.6s; width: 4px; height: 4px; }
+  .fashion-sparkle-3 { top: 45%; left: 8%; animation-delay: 1.2s; }
+  .fashion-sparkle-4 { top: 62%; right: 12%; animation-delay: 0.3s; width: 5px; height: 5px; }
+  .fashion-sparkle-5 { bottom: 25%; left: 35%; animation-delay: 1.8s; }
+  .fashion-sparkle-6 { top: 72%; right: 30%; animation-delay: 0.9s; width: 4px; height: 4px; }
+  .fashion-sparkle-7 { top: 18%; right: 42%; animation-delay: 2.1s; }
+  .fashion-sparkle-8 { bottom: 40%; right: 8%; animation-delay: 1.5s; width: 5px; height: 5px; }
+
+  .fashion-burst-ring {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    width: 320px;
+    height: 320px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    border: 1px solid rgb(255 45 146 / 0.12);
+    animation: burst-ring-pulse 5s ease-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fashion-ambient,
+    .fashion-orb,
+    .fashion-sparkle,
+    .fashion-burst-ring,
+    .animate-float,
+    .animate-glow-pulse,
+    .animate-sparkle-spin,
+    .text-gradient-neon,
+    .text-gradient-pink,
+    .neon-border::before,
+    .fashion-hero-burst::before,
+    .logo-burst::before {
+      animation: none !important;
+    }
+
+    .fashion-card:hover {
+      transform: none;
+    }
+  }
 }
 
 @keyframes aurora-shift {
   0% {
-    filter: hue-rotate(0deg);
-    transform: scale(1);
+    filter: hue-rotate(0deg) saturate(1);
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    filter: hue-rotate(18deg) saturate(1.15);
+    transform: scale(1.04) translate(1%, -1%);
   }
   100% {
-    filter: hue-rotate(12deg);
-    transform: scale(1.02);
+    filter: hue-rotate(8deg) saturate(1.05);
+    transform: scale(1.02) translate(-1%, 1%);
   }
 }
 
@@ -341,5 +602,117 @@
   }
   50% {
     box-shadow: 0 0 0 8px rgb(255 45 146 / 0);
+  }
+}
+
+@keyframes fashion-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  60% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  70% {
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 20px rgb(255 45 146 / 0.4),
+      0 0 60px rgb(255 45 146 / 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 32px rgb(255 45 146 / 0.65),
+      0 0 90px rgb(217 70 239 / 0.3);
+  }
+}
+
+@keyframes sparkle-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-burst {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@keyframes logo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(24px, -18px) scale(1.06);
+  }
+  66% {
+    transform: translate(-16px, 22px) scale(0.94);
+  }
+}
+
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(180deg);
+  }
+}
+
+@keyframes burst-ring-pulse {
+  0% {
+    opacity: 0.6;
+    transform: translateX(-50%) scale(0.85);
+  }
+  50% {
+    opacity: 0.15;
+    transform: translateX(-50%) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.35);
   }
 }

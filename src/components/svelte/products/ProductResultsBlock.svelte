@@ -284,24 +284,28 @@
     </div>
   {:else if bestOverall && bestValue && results.bestOverallId}
     <div class="grid gap-4 sm:grid-cols-2">
-      <HighlightCard
-        product={bestOverall}
-        label="Best Overall Match"
-        variant="overall"
-        {budgetMax}
-        compareSelected={isCompareSelected(bestOverall.id)}
-        compareDisabled={isCompareDisabled(bestOverall.id)}
-        oncomparetoggle={() => toggleCompare(bestOverall.id)}
-      />
-      <HighlightCard
-        product={bestValue}
-        label="Best Value Pick"
-        variant="value"
-        {budgetMax}
-        compareSelected={isCompareSelected(bestValue.id)}
-        compareDisabled={isCompareDisabled(bestValue.id)}
-        oncomparetoggle={() => toggleCompare(bestValue.id)}
-      />
+      <div class="animate-fashion-pop" style="animation-delay: 0ms">
+        <HighlightCard
+          product={bestOverall}
+          label="Best Overall Match"
+          variant="overall"
+          {budgetMax}
+          compareSelected={isCompareSelected(bestOverall.id)}
+          compareDisabled={isCompareDisabled(bestOverall.id)}
+          oncomparetoggle={() => toggleCompare(bestOverall.id)}
+        />
+      </div>
+      <div class="animate-fashion-pop" style="animation-delay: 100ms">
+        <HighlightCard
+          product={bestValue}
+          label="Best Value Pick"
+          variant="value"
+          {budgetMax}
+          compareSelected={isCompareSelected(bestValue.id)}
+          compareDisabled={isCompareDisabled(bestValue.id)}
+          oncomparetoggle={() => toggleCompare(bestValue.id)}
+        />
+      </div>
     </div>
   {/if}
 
@@ -312,14 +316,16 @@
   />
 
   <div class="grid grid-cols-2 gap-3 sm:gap-4">
-    {#each sortedGridProducts as product (product.id)}
-      <ProductCard
-        {product}
-        {budgetMax}
-        compareSelected={isCompareSelected(product.id)}
-        compareDisabled={isCompareDisabled(product.id)}
-        oncomparetoggle={() => toggleCompare(product.id)}
-      />
+    {#each sortedGridProducts as product, i (product.id)}
+      <div class="animate-fashion-pop" style="animation-delay: {i * 60}ms">
+        <ProductCard
+          {product}
+          {budgetMax}
+          compareSelected={isCompareSelected(product.id)}
+          compareDisabled={isCompareDisabled(product.id)}
+          oncomparetoggle={() => toggleCompare(product.id)}
+        />
+      </div>
     {/each}
   </div>
 

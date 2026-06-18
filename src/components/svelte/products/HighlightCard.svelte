@@ -45,8 +45,8 @@
 </script>
 
 <article
-  class="glass-panel-elevated neon-border card-hover-lift scan-line rounded-2xl p-4 ring-1 {borderGlow} {compareSelected
-    ? 'ring-2 ring-pink/50'
+  class="fashion-card glass-panel-elevated neon-border scan-line rounded-2xl p-4 ring-1 {borderGlow} {compareSelected
+    ? 'ring-2 ring-pink/50 animate-glow-pulse'
     : ''}"
 >
   <div class="mb-3 flex items-center justify-between gap-2">

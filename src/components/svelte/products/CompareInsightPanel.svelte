@@ -31,7 +31,7 @@
   }
 </script>
 
-<section class="glass-panel-elevated neon-border scan-line animate-slide-up rounded-2xl p-4 sm:p-5">
+<section class="glass-panel-elevated neon-border scan-line animate-fashion-pop rounded-2xl p-4 sm:p-5">
   <div class="mb-4 flex items-start justify-between gap-3">
     <div>
       <p class="font-display text-[11px] font-bold uppercase tracking-[0.2em] text-gradient-neon">
@@ -51,7 +51,7 @@
   </div>
 
   <!-- Verdict -->
-  <div class="rounded-xl bg-gradient-to-r from-pink/10 via-violet/10 to-cyan/10 px-4 py-3 ring-1 ring-pink/20">
+  <div class="animate-glow-pulse rounded-xl bg-gradient-to-r from-pink/10 via-violet/10 to-cyan/10 px-4 py-3 ring-1 ring-pink/20">
     <p class="text-sm font-semibold leading-snug text-text">{insight.verdict}</p>
     <p class="mt-1.5 text-xs leading-relaxed text-text-muted">{insight.recommendation}</p>
   </div>

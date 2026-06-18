@@ -29,8 +29,8 @@
 </script>
 
 <article
-  class="group glass-panel card-hover-lift neon-border flex flex-col rounded-2xl p-3 {compareSelected
-    ? 'ring-2 ring-pink/50'
+  class="group fashion-card glass-panel neon-border flex flex-col rounded-2xl p-3 {compareSelected
+    ? 'ring-2 ring-pink/50 animate-glow-pulse'
     : ''}"
 >
   <div class="relative">

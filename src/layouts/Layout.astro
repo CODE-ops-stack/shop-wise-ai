@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import FashionAmbient from '../components/FashionAmbient.astro';
 import { SITE } from '../../config/site';
 
 interface Props {
@@ -60,6 +61,7 @@ const jsonLd = {
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body class="futuristic-bg min-h-screen antialiased">
+		<FashionAmbient />
 		<slot />
 	</body>
 </html>

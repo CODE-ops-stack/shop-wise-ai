@@ -36,7 +36,7 @@
     <img
       src={src}
       alt={title}
-      class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+      class="h-full w-full object-cover transition duration-700 group-hover:scale-110"
       loading="lazy"
       referrerpolicy="no-referrer"
       onerror={handleError}
