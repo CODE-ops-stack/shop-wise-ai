@@ -2,7 +2,9 @@
   import PreferencePanel from '../preferences/PreferencePanel.svelte';
   import ProductResultsBlock from '../products/ProductResultsBlock.svelte';
   import AppFooter from '../ui/AppFooter.svelte';
+  import ProductSearchSkeleton from '../products/ProductSearchSkeleton.svelte';
   import { EXAMPLE_PROMPTS, TRUST_FEATURES } from '../../../../config/site';
+  import { getRecentSearches, saveRecentSearch } from '../../../lib/ui/recent-searches';
   import { analyzeQuery, panelSummary, resolvePreferences } from '../../../lib/preferences/analyzer';
   import type { AnalyzeResponse, SearchErrorResponse, SearchResponse } from '../../../types/api';
   import type { ChatMessage } from '../../../types/chat';
@@ -18,6 +20,8 @@
   let isSearching = $state(false);
   let refiningMessageId = $state<string | null>(null);
   let messagesContainer = $state<HTMLDivElement | null>(null);
+  let textareaEl = $state<HTMLTextAreaElement | null>(null);
+  let recentSearches = $state<string[]>([]);
 
   const hasPendingPanel = $derived(
     messages.some((m) => m.type === 'preference_panel' && m.status === 'pending'),
@@ -227,6 +231,8 @@
     };
 
     messages = [...messages, userMessage];
+    saveRecentSearch(trimmed);
+    recentSearches = getRecentSearches();
     isAnalyzing = true;
 
     try {
@@ -260,6 +266,10 @@
   }
 
   $effect(() => {
+    recentSearches = getRecentSearches();
+  });
+
+  $effect(() => {
     void messages.length;
     void isAnalyzing;
     void isEnhancing;
@@ -270,6 +280,27 @@
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     });
   });
+
+  $effect(() => {
+    void input;
+    const el = textareaEl;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+  });
+
+  function isTypingTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable;
+  }
+
+  function onGlobalKeydown(event: KeyboardEvent) {
+    if (event.key === '/' && !isTypingTarget(event.target)) {
+      event.preventDefault();
+      textareaEl?.focus();
+    }
+  }
 
   function handlePreferenceSubmit(messageId: string, selections: FilledSlots) {
     const panelMessage = messages.find(
@@ -345,6 +376,8 @@
   }
 </script>
 
+<svelte:window onkeydown={onGlobalKeydown} />
+
 <div class="relative mx-auto flex min-h-screen max-w-3xl flex-col px-4 pb-6 pt-5 sm:px-6">
   <!-- Header -->
   <header class="glass-panel-elevated neon-border scan-line mb-5 rounded-2xl px-5 py-4 animate-fade-in">
@@ -405,6 +438,23 @@
             </button>
           {/each}
         </div>
+
+        {#if recentSearches.length > 0}
+          <div class="mt-5 text-left">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-text-subtle">Recent</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              {#each recentSearches as query}
+                <button
+                  type="button"
+                  class="rounded-full border border-violet/20 bg-violet/10 px-3 py-1.5 text-xs font-medium text-text-muted transition hover:border-violet/40 hover:text-text"
+                  onclick={() => useExamplePrompt(query)}
+                >
+                  {query}
+                </button>
+              {/each}
+            </div>
+          </div>
+        {/if}
 
         <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
           {#each TRUST_FEATURES as feature}
@@ -508,11 +558,12 @@
     {/if}
 
     {#if isSearching}
-      <div class="flex justify-start animate-fade-in">
+      <div class="w-full animate-fade-in space-y-3">
         <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3 border-pink/15">
           <span class="h-2 w-2 animate-pulse rounded-full bg-cyan"></span>
           <span class="text-sm text-text-muted">Finding products with AI…</span>
         </div>
+        <ProductSearchSkeleton />
       </div>
     {/if}
   </div>
@@ -521,7 +572,8 @@
   <div class="glass-panel-elevated neon-border sticky bottom-4 rounded-2xl p-3 sm:bottom-6" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
     <div class="flex items-end gap-2">
       <textarea
-        class="min-h-[48px] flex-1 resize-none rounded-xl border border-white/8 bg-surface/80 px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-subtle focus:border-pink/50 focus:ring-2 focus:ring-pink/25 disabled:opacity-50"
+        bind:this={textareaEl}
+        class="min-h-[48px] max-h-32 flex-1 resize-none rounded-xl border border-white/8 bg-surface/80 px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-subtle focus:border-pink/50 focus:ring-2 focus:ring-pink/25 disabled:opacity-50"
         rows="1"
         placeholder="What are you shopping for?"
         bind:value={input}
@@ -540,7 +592,9 @@
       </button>
     </div>
     <p class="mt-2 text-center text-[10px] text-text-subtle">
-      <kbd class="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">Enter</kbd> to send
+      <kbd class="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">/</kbd> focus
+      <span class="mx-1 text-white/20">·</span>
+      <kbd class="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">Enter</kbd> send
       <span class="mx-1 text-white/20">·</span>
       <kbd class="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">Shift+Enter</kbd> new line
     </p>

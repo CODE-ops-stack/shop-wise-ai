@@ -3,6 +3,7 @@
   import type { Product, ProductResultsPayload } from '../../../types/products';
   import type { SearchErrorResponse, SearchResponse } from '../../../types/api';
   import type { QuickFilterId } from '../../../lib/products/visible-filters';
+  import { getBudgetMax } from '../../../lib/ui/budget';
   import HighlightCard from './HighlightCard.svelte';
   import ProductCard from './ProductCard.svelte';
   import QuickFilters from './QuickFilters.svelte';
@@ -16,6 +17,8 @@
 
   let { results, preferences, isRefining = false, onrefine }: Props = $props();
 
+  type SortMode = 'match' | 'price';
+
   let gridProducts = $state<Product[]>([]);
   let cursor = $state<string | null>(null);
   let hasMore = $state(false);
@@ -23,6 +26,9 @@
   let isLoadingMore = $state(false);
   let loadError = $state<string | null>(null);
   let sentinel = $state<HTMLElement | null>(null);
+  let sortMode = $state<SortMode>('match');
+
+  const budgetMax = $derived(getBudgetMax(preferences.slots));
 
   const bestOverall = $derived(
     results.products.find((p) => p.id === results.bestOverallId) ?? results.products[0],
@@ -30,6 +36,12 @@
 
   const bestValue = $derived(
     results.products.find((p) => p.id === results.bestValueId) ?? results.products[1],
+  );
+
+  const sortedGridProducts = $derived(
+    sortMode === 'price'
+      ? [...gridProducts].sort((a, b) => a.price - b.price)
+      : gridProducts,
   );
 
   function initFromResults(payload: ProductResultsPayload) {
@@ -41,6 +53,7 @@
     totalShown = payload.totalShown;
     loadError = null;
     isLoadingMore = false;
+    sortMode = 'match';
   }
 
   $effect(() => {
@@ -97,11 +110,17 @@
     observer.observe(node);
     return () => observer.disconnect();
   });
+
+  function sortChipClass(active: boolean): string {
+    return active
+      ? 'chip-neon-active border'
+      : 'border-white/10 bg-surface/80 text-text-muted hover:border-pink/30 hover:text-text';
+  }
 </script>
 
 <section class="w-full space-y-4">
   <div class="glass-panel-elevated neon-border scan-line rounded-2xl px-5 py-4">
-    <div class="flex items-baseline justify-between gap-2">
+    <div class="flex flex-wrap items-baseline justify-between gap-2">
       <p class="font-display text-base font-bold text-text">
         <span class="text-gradient-neon">{totalShown}</span>
         <span class="text-text-muted"> products found</span>
@@ -119,6 +138,29 @@
       </svg>
       Verified exact product page links
     </p>
+
+    {#if totalShown > 1}
+      <div class="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="rounded-full border px-3 py-1.5 text-[11px] font-semibold transition {sortChipClass(
+            sortMode === 'match',
+          )}"
+          onclick={() => (sortMode = 'match')}
+        >
+          Best match
+        </button>
+        <button
+          type="button"
+          class="rounded-full border px-3 py-1.5 text-[11px] font-semibold transition {sortChipClass(
+            sortMode === 'price',
+          )}"
+          onclick={() => (sortMode = 'price')}
+        >
+          Price: low → high
+        </button>
+      </div>
+    {/if}
   </div>
 
   {#if totalShown === 0 && !isRefining}
@@ -130,8 +172,13 @@
     </div>
   {:else if bestOverall && bestValue && results.bestOverallId}
     <div class="grid gap-4 sm:grid-cols-2">
-      <HighlightCard product={bestOverall} label="Best Overall Match" variant="overall" />
-      <HighlightCard product={bestValue} label="Best Value Pick" variant="value" />
+      <HighlightCard
+        product={bestOverall}
+        label="Best Overall Match"
+        variant="overall"
+        {budgetMax}
+      />
+      <HighlightCard product={bestValue} label="Best Value Pick" variant="value" {budgetMax} />
     </div>
   {/if}
 
@@ -142,8 +189,8 @@
   />
 
   <div class="grid grid-cols-2 gap-3 sm:gap-4">
-    {#each gridProducts as product (product.id)}
-      <ProductCard {product} />
+    {#each sortedGridProducts as product (product.id)}
+      <ProductCard {product} {budgetMax} />
     {/each}
   </div>
 

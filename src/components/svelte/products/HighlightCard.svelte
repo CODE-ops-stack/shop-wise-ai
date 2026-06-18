@@ -1,7 +1,9 @@
 <script lang="ts">
   import { getMarketplace } from '../../../../config/marketplaces';
   import type { Product } from '../../../types/products';
+  import { isWithinBudget } from '../../../lib/ui/budget';
   import { formatInr, savingsInr } from '../../../lib/ui/format';
+  import CopyLinkButton from '../ui/CopyLinkButton.svelte';
   import DiscountBadge from '../ui/DiscountBadge.svelte';
   import ProductImage from './ProductImage.svelte';
 
@@ -9,9 +11,10 @@
     product: Product;
     label: string;
     variant: 'overall' | 'value';
+    budgetMax?: number;
   }
 
-  let { product, label, variant }: Props = $props();
+  let { product, label, variant, budgetMax }: Props = $props();
 
   const marketplace = $derived(getMarketplace(product.marketplace));
 
@@ -26,6 +29,7 @@
   );
 
   const saved = $derived(savingsInr(product.price, product.originalPrice));
+  const withinBudget = $derived(isWithinBudget(product.price, budgetMax));
 </script>
 
 <article
@@ -40,7 +44,7 @@
     <span class="text-xs font-medium text-text-subtle">{marketplace.label}</span>
   </div>
 
-  <div class="relative">
+  <div class="relative group/image">
     <ProductImage
       title={product.title}
       imageUrl={product.imageUrl}
@@ -48,11 +52,21 @@
       marketplaceLabel={marketplace.label}
       tall
     />
-    {#if product.originalPrice}
-      <div class="absolute left-2 top-2">
+    <div class="absolute left-2 top-2 flex flex-col gap-1">
+      {#if product.originalPrice}
         <DiscountBadge price={product.price} originalPrice={product.originalPrice} size="md" />
-      </div>
-    {/if}
+      {/if}
+      {#if withinBudget}
+        <span
+          class="rounded-lg bg-cyan/20 px-2 py-0.5 text-[10px] font-bold text-cyan ring-1 ring-cyan/30"
+        >
+          In budget
+        </span>
+      {/if}
+    </div>
+    <div class="absolute right-2 top-2">
+      <CopyLinkButton url={product.url} />
+    </div>
   </div>
 
   <h3 class="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-text">{product.title}</h3>

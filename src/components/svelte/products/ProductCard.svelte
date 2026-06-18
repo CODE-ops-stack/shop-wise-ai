@@ -1,17 +1,21 @@
 <script lang="ts">
   import { getMarketplace } from '../../../../config/marketplaces';
   import type { Product } from '../../../types/products';
+  import { isWithinBudget } from '../../../lib/ui/budget';
   import { formatInr } from '../../../lib/ui/format';
+  import CopyLinkButton from '../ui/CopyLinkButton.svelte';
   import DiscountBadge from '../ui/DiscountBadge.svelte';
   import ProductImage from './ProductImage.svelte';
 
   interface Props {
     product: Product;
+    budgetMax?: number;
   }
 
-  let { product }: Props = $props();
+  let { product, budgetMax }: Props = $props();
 
   const marketplace = $derived(getMarketplace(product.marketplace));
+  const withinBudget = $derived(isWithinBudget(product.price, budgetMax));
 </script>
 
 <article
@@ -24,11 +28,21 @@
       productUrl={product.url}
       marketplaceLabel={marketplace.label}
     />
-    {#if product.originalPrice}
-      <div class="absolute left-2 top-2">
+    <div class="absolute left-2 top-2 flex flex-col gap-1">
+      {#if product.originalPrice}
         <DiscountBadge price={product.price} originalPrice={product.originalPrice} />
-      </div>
-    {/if}
+      {/if}
+      {#if withinBudget}
+        <span
+          class="rounded-md bg-cyan/20 px-1.5 py-0.5 text-[10px] font-bold text-cyan ring-1 ring-cyan/30"
+        >
+          In budget
+        </span>
+      {/if}
+    </div>
+    <div class="absolute right-2 top-2 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
+      <CopyLinkButton url={product.url} />
+    </div>
   </div>
 
   <div class="mb-1.5 flex items-center justify-between gap-2">
