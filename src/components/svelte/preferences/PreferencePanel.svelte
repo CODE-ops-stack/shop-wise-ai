@@ -62,8 +62,8 @@
 
   function chipClass(active: boolean): string {
     return active
-      ? 'border-pink bg-pink/20 text-pink ring-1 ring-pink/40 shadow-sm shadow-pink/10'
-      : 'border-white/10 bg-surface text-text-muted hover:border-pink/30 hover:bg-surface-hover hover:text-text';
+      ? 'chip-neon-active border'
+      : 'border-white/10 bg-surface/80 text-text-muted hover:border-pink/40 hover:bg-surface-hover hover:text-text hover:shadow-sm hover:shadow-pink/10';
   }
 
   function handleSubmit() {
@@ -71,9 +71,9 @@
   }
 </script>
 
-<div class="glass-panel-elevated rounded-2xl p-5">
-  <div class="mb-5 border-b border-white/6 pb-4">
-    <h3 class="text-base font-semibold text-text">{panel.title}</h3>
+<div class="glass-panel-elevated neon-border scan-line rounded-2xl p-5">
+  <div class="mb-5 border-b border-pink/10 pb-4">
+    <h3 class="font-display text-base font-semibold text-text">{panel.title}</h3>
     {#if panel.subtitle}
       <p class="mt-1.5 text-xs leading-relaxed text-text-muted">{panel.subtitle}</p>
     {/if}
@@ -133,7 +133,7 @@
   <div class="mt-6 flex items-center gap-3 border-t border-white/6 pt-5">
     <button
       type="button"
-      class="flex-1 rounded-xl bg-gradient-to-r from-pink to-pink-deep px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-pink/20 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+      class="btn-neon flex-1 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-40"
       {disabled}
       onclick={handleSubmit}
     >

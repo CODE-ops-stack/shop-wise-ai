@@ -30,18 +30,18 @@
 
   function chipClass(active: boolean): string {
     return active
-      ? 'border-pink bg-pink/20 text-pink ring-1 ring-pink/40'
-      : 'border-white/10 bg-surface text-text-muted hover:border-pink/30 hover:text-text';
+      ? 'chip-neon-active border'
+      : 'border-white/10 bg-surface/80 text-text-muted hover:border-cyan/30 hover:text-text';
   }
 </script>
 
 {#if visibleFilters.length > 0}
-  <section class="glass-panel rounded-2xl p-4">
+  <section class="glass-panel neon-border rounded-2xl p-4">
     <div class="flex items-center gap-2">
-      <svg class="h-4 w-4 text-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg class="h-4 w-4 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
       </svg>
-      <h3 class="text-xs font-bold uppercase tracking-widest text-text">Quick filters</h3>
+      <h3 class="font-display text-xs font-bold uppercase tracking-widest text-gradient-neon">Quick filters</h3>
     </div>
     <p class="mt-1.5 text-xs text-text-subtle">
       Refine results — filters you already set in chat are hidden.

@@ -100,10 +100,10 @@
 </script>
 
 <section class="w-full space-y-4">
-  <div class="glass-panel-elevated rounded-2xl px-5 py-4">
+  <div class="glass-panel-elevated neon-border scan-line rounded-2xl px-5 py-4">
     <div class="flex items-baseline justify-between gap-2">
-      <p class="text-base font-bold text-text">
-        <span class="text-gradient-pink">{totalShown}</span>
+      <p class="font-display text-base font-bold text-text">
+        <span class="text-gradient-neon">{totalShown}</span>
         <span class="text-text-muted"> products found</span>
       </p>
       {#if isRefining}
@@ -137,7 +137,7 @@
   {#if hasMore || isLoadingMore}
     <div
       bind:this={sentinel}
-      class="flex items-center justify-center rounded-2xl border border-dashed border-pink/20 bg-pink/5 py-8"
+      class="flex items-center justify-center rounded-2xl border border-dashed border-pink/30 bg-gradient-to-b from-pink/5 to-violet/5 py-8 neon-glow"
     >
       {#if isLoadingMore}
         <div class="flex items-center gap-3">

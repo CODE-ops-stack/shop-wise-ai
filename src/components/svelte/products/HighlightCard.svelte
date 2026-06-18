@@ -15,12 +15,12 @@
 
   const badgeClass = $derived(
     variant === 'overall'
-      ? 'bg-gradient-to-r from-pink/25 to-pink-deep/25 text-pink ring-pink/40'
-      : 'bg-gradient-to-r from-amber-500/15 to-orange-500/15 text-amber-300 ring-amber-500/30',
+      ? 'bg-gradient-to-r from-pink/30 to-violet/20 text-pink-neon ring-pink/50 neon-glow'
+      : 'bg-gradient-to-r from-amber-500/20 to-orange-500/15 text-amber-300 ring-amber-500/40',
   );
 
   const borderGlow = $derived(
-    variant === 'overall' ? 'ring-pink/20' : 'ring-amber-500/15',
+    variant === 'overall' ? 'ring-pink/30 neon-glow-strong' : 'ring-amber-500/20',
   );
 
   function formatPrice(price: number): string {
@@ -33,7 +33,7 @@
 </script>
 
 <article
-  class="glass-panel-elevated rounded-2xl p-4 ring-1 {borderGlow} transition hover:ring-pink/35"
+  class="glass-panel-elevated neon-border card-hover-lift scan-line rounded-2xl p-4 ring-1 {borderGlow}"
 >
   <div class="mb-3 flex items-center justify-between gap-2">
     <span
@@ -84,7 +84,7 @@
     href={product.url}
     target="_blank"
     rel="noopener noreferrer"
-    class="mt-4 block rounded-xl bg-gradient-to-r from-pink to-pink-deep px-4 py-3 text-center text-xs font-bold text-white shadow-lg shadow-pink/25 transition hover:brightness-110"
+    class="btn-neon mt-4 block rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-wide text-white"
   >
     Open exact product on {marketplace.label}
   </a>

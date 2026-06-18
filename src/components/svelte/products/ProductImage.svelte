@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="mb-2 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-surface-elevated to-ink-soft ring-1 ring-white/6 {tall
+  class="mb-2 flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-surface-elevated via-ink-soft to-violet/10 ring-1 ring-white/8 transition group-hover:ring-pink/40 group-hover:shadow-lg group-hover:shadow-pink/10 {tall
     ? 'h-44'
     : 'h-36'}"
 >

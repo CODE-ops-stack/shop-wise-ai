@@ -312,24 +312,24 @@
 
 <div class="relative mx-auto flex min-h-screen max-w-3xl flex-col px-4 pb-6 pt-5 sm:px-6">
   <!-- Header -->
-  <header class="glass-panel-elevated mb-5 rounded-2xl px-5 py-4 animate-fade-in">
+  <header class="glass-panel-elevated neon-border scan-line mb-5 rounded-2xl px-5 py-4 animate-fade-in">
     <div class="flex items-center gap-3">
       <div
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink to-pink-deep pink-glow"
+        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink via-magenta to-violet pink-glow animate-float"
       >
-        <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg class="h-5 w-5 text-white drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
       </div>
       <div class="min-w-0 flex-1">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-pink">ShopWise AI</p>
-        <h1 class="truncate text-lg font-bold tracking-tight text-text sm:text-xl">
-          Find the right product, <span class="text-gradient-pink">fast</span>
+        <p class="font-display text-[11px] font-bold uppercase tracking-[0.25em] text-gradient-neon">ShopWise AI</p>
+        <h1 class="truncate font-display text-lg font-bold tracking-tight text-text sm:text-xl">
+          Find the right product, <span class="text-gradient-neon">fast</span>
         </h1>
       </div>
     </div>
     <p class="mt-2.5 text-xs leading-relaxed text-text-muted">
-      Premium shopping assistant · Myntra · AJIO · Nykaa Fashion · Amazon · Flipkart
+      <span class="text-cyan/80">Next-gen</span> shopping · Myntra · AJIO · Nykaa Fashion · Amazon · Flipkart
     </p>
   </header>
 
@@ -337,14 +337,15 @@
   <div class="flex-1 space-y-4 overflow-y-auto pb-4">
     {#if messages.length === 0}
       <div
-        class="glass-panel rounded-2xl border-dashed border-pink/20 p-8 text-center animate-slide-up"
+        class="glass-panel neon-border card-hover-lift rounded-2xl border-dashed border-pink/25 p-8 text-center animate-slide-up"
       >
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-pink/10 ring-1 ring-pink/25">
-          <svg class="h-6 w-6 text-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink/20 to-violet/20 ring-1 ring-pink/30 neon-glow animate-float">
+          <svg class="h-7 w-7 text-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <p class="text-sm text-text-muted">Start with something like</p>
+        <p class="font-display text-base font-semibold text-gradient-neon">What are you shopping for?</p>
+        <p class="mt-2 text-sm text-text-muted">Start with something like</p>
         <p class="mt-2 text-sm font-medium text-text">
           "Black cotton kurta for men under ₹1500"
         </p>
@@ -360,8 +361,8 @@
           <div
             class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed
               {message.role === 'user'
-              ? 'bg-gradient-to-br from-pink to-pink-deep text-white shadow-lg shadow-pink/20'
-              : 'glass-panel text-text-muted'}"
+              ? 'bg-gradient-to-br from-pink via-magenta to-violet text-white shadow-lg shadow-pink/30 neon-glow'
+              : 'glass-panel border-cyan/15 text-text-muted'}"
           >
             {message.content}
           </div>
@@ -370,12 +371,12 @@
         <div class="flex animate-slide-up justify-start">
           <div class="w-full max-w-lg">
             {#if message.status === 'submitted' && message.submittedPreferences}
-              <div class="glass-panel rounded-2xl px-4 py-3">
-                <p class="text-[10px] font-semibold uppercase tracking-widest text-pink">Preferences saved</p>
+              <div class="glass-panel neon-border rounded-2xl px-4 py-3">
+                <p class="text-[10px] font-semibold uppercase tracking-widest text-gradient-neon">Preferences saved</p>
                 <div class="mt-2.5 flex flex-wrap gap-2">
                   {#each panelSummary(message.submittedPreferences) as chip}
                     <span
-                      class="rounded-full bg-pink/10 px-3 py-1 text-xs font-medium text-pink ring-1 ring-pink/25"
+                      class="chip-neon-active rounded-full border px-3 py-1 text-xs font-medium"
                     >
                       {chip}
                     </span>
@@ -409,7 +410,7 @@
 
     {#if isAnalyzing}
       <div class="flex justify-start animate-fade-in">
-        <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3">
+        <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3 border-cyan/15">
           <span class="relative flex h-2.5 w-2.5">
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-pink opacity-60"></span>
             <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-pink"></span>
@@ -421,7 +422,7 @@
 
     {#if isEnhancing}
       <div class="flex justify-start animate-fade-in">
-        <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3">
+        <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3 border-violet/15">
           <span class="h-2 w-2 animate-shimmer rounded-full bg-pink-glow"></span>
           <span class="text-sm text-text-muted">Refining with AI…</span>
         </div>
@@ -430,8 +431,8 @@
 
     {#if isSearching}
       <div class="flex justify-start animate-fade-in">
-        <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3">
-          <span class="h-2 w-2 animate-pulse rounded-full bg-pink"></span>
+        <div class="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3 border-pink/15">
+          <span class="h-2 w-2 animate-pulse rounded-full bg-cyan"></span>
           <span class="text-sm text-text-muted">Finding products with AI…</span>
         </div>
       </div>
@@ -439,10 +440,10 @@
   </div>
 
   <!-- Input -->
-  <div class="glass-panel-elevated sticky bottom-4 rounded-2xl p-3 sm:bottom-6">
+  <div class="glass-panel-elevated neon-border sticky bottom-4 rounded-2xl p-3 sm:bottom-6">
     <div class="flex items-end gap-2">
       <textarea
-        class="min-h-[48px] flex-1 resize-none rounded-xl border border-white/8 bg-surface px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-subtle focus:border-pink/50 focus:ring-2 focus:ring-pink/20 disabled:opacity-50"
+        class="min-h-[48px] flex-1 resize-none rounded-xl border border-white/8 bg-surface/80 px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-subtle focus:border-pink/50 focus:ring-2 focus:ring-pink/25 disabled:opacity-50"
         rows="1"
         placeholder="What are you shopping for?"
         bind:value={input}
@@ -451,7 +452,7 @@
       ></textarea>
       <button
         type="button"
-        class="rounded-xl bg-gradient-to-r from-pink to-pink-deep px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-pink/25 transition hover:brightness-110 hover:shadow-pink/40 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+        class="btn-neon rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-40"
         disabled={!input.trim() || isAnalyzing || hasPendingPanel || isSearching}
         onclick={handleSubmit}
       >

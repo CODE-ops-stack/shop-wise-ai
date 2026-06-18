@@ -21,7 +21,7 @@
 </script>
 
 <article
-  class="group glass-panel flex flex-col rounded-2xl p-3 transition-all duration-300 hover:border-pink/25 hover:shadow-lg hover:shadow-pink/5"
+  class="group glass-panel card-hover-lift neon-border flex flex-col rounded-2xl p-3"
 >
   <ProductImage
     title={product.title}
@@ -62,7 +62,7 @@
     href={product.url}
     target="_blank"
     rel="noopener noreferrer"
-    class="mt-auto mt-3 block rounded-xl bg-surface-elevated px-3 py-2.5 text-center text-xs font-semibold text-text ring-1 ring-white/10 transition group-hover:bg-pink group-hover:text-white group-hover:ring-pink/50"
+    class="mt-auto mt-3 block rounded-xl bg-surface-elevated px-3 py-2.5 text-center text-xs font-semibold text-text ring-1 ring-white/10 transition group-hover:bg-gradient-to-r group-hover:from-pink group-hover:to-violet group-hover:text-white group-hover:ring-pink/50 group-hover:shadow-lg group-hover:shadow-pink/20"
   >
     Open on {marketplace.label}
   </a>
