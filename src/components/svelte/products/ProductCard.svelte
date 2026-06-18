@@ -5,21 +5,33 @@
   import { formatInr } from '../../../lib/ui/format';
   import CopyLinkButton from '../ui/CopyLinkButton.svelte';
   import DiscountBadge from '../ui/DiscountBadge.svelte';
+  import CompareToggle from './CompareToggle.svelte';
   import ProductImage from './ProductImage.svelte';
 
   interface Props {
     product: Product;
     budgetMax?: number;
+    compareSelected?: boolean;
+    compareDisabled?: boolean;
+    oncomparetoggle?: () => void;
   }
 
-  let { product, budgetMax }: Props = $props();
+  let {
+    product,
+    budgetMax,
+    compareSelected = false,
+    compareDisabled = false,
+    oncomparetoggle,
+  }: Props = $props();
 
   const marketplace = $derived(getMarketplace(product.marketplace));
   const withinBudget = $derived(isWithinBudget(product.price, budgetMax));
 </script>
 
 <article
-  class="group glass-panel card-hover-lift neon-border flex flex-col rounded-2xl p-3"
+  class="group glass-panel card-hover-lift neon-border flex flex-col rounded-2xl p-3 {compareSelected
+    ? 'ring-2 ring-pink/50'
+    : ''}"
 >
   <div class="relative">
     <ProductImage
@@ -75,6 +87,16 @@
 
   {#if product.highlights[0]}
     <p class="mt-1.5 line-clamp-1 text-[10px] text-cyan/70">{product.highlights[0]}</p>
+  {/if}
+
+  {#if oncomparetoggle}
+    <div class="mt-2">
+      <CompareToggle
+        selected={compareSelected}
+        disabled={compareDisabled}
+        onclick={oncomparetoggle}
+      />
+    </div>
   {/if}
 
   <a

@@ -5,6 +5,7 @@
   import { formatInr, savingsInr } from '../../../lib/ui/format';
   import CopyLinkButton from '../ui/CopyLinkButton.svelte';
   import DiscountBadge from '../ui/DiscountBadge.svelte';
+  import CompareToggle from './CompareToggle.svelte';
   import ProductImage from './ProductImage.svelte';
 
   interface Props {
@@ -12,9 +13,20 @@
     label: string;
     variant: 'overall' | 'value';
     budgetMax?: number;
+    compareSelected?: boolean;
+    compareDisabled?: boolean;
+    oncomparetoggle?: () => void;
   }
 
-  let { product, label, variant, budgetMax }: Props = $props();
+  let {
+    product,
+    label,
+    variant,
+    budgetMax,
+    compareSelected = false,
+    compareDisabled = false,
+    oncomparetoggle,
+  }: Props = $props();
 
   const marketplace = $derived(getMarketplace(product.marketplace));
 
@@ -33,7 +45,9 @@
 </script>
 
 <article
-  class="glass-panel-elevated neon-border card-hover-lift scan-line rounded-2xl p-4 ring-1 {borderGlow}"
+  class="glass-panel-elevated neon-border card-hover-lift scan-line rounded-2xl p-4 ring-1 {borderGlow} {compareSelected
+    ? 'ring-2 ring-pink/50'
+    : ''}"
 >
   <div class="mb-3 flex items-center justify-between gap-2">
     <span
@@ -99,6 +113,16 @@
       </span>
     {/each}
   </div>
+
+  {#if oncomparetoggle}
+    <div class="mt-3">
+      <CompareToggle
+        selected={compareSelected}
+        disabled={compareDisabled}
+        onclick={oncomparetoggle}
+      />
+    </div>
+  {/if}
 
   <a
     href={product.url}

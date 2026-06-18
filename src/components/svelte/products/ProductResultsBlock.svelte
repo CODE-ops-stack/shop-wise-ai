@@ -3,7 +3,9 @@
   import type { Product, ProductResultsPayload } from '../../../types/products';
   import type { SearchErrorResponse, SearchResponse } from '../../../types/api';
   import type { QuickFilterId } from '../../../lib/products/visible-filters';
+  import { MAX_COMPARE_ITEMS } from '../../../lib/products/compare-analyzer';
   import { getBudgetMax } from '../../../lib/ui/budget';
+  import CompareInsightPanel from './CompareInsightPanel.svelte';
   import HighlightCard from './HighlightCard.svelte';
   import ProductCard from './ProductCard.svelte';
   import QuickFilters from './QuickFilters.svelte';
@@ -27,8 +29,30 @@
   let loadError = $state<string | null>(null);
   let sentinel = $state<HTMLElement | null>(null);
   let sortMode = $state<SortMode>('match');
+  let compareIds = $state<string[]>([]);
+  let showComparePanel = $state(false);
+  let compareHint = $state<string | null>(null);
 
   const budgetMax = $derived(getBudgetMax(preferences.slots));
+
+  const allProducts = $derived.by(() => {
+    const byId = new Map<string, Product>();
+    for (const product of results.products) byId.set(product.id, product);
+    for (const product of gridProducts) byId.set(product.id, product);
+    if (bestOverall) byId.set(bestOverall.id, bestOverall);
+    if (bestValue) byId.set(bestValue.id, bestValue);
+    return Array.from(byId.values());
+  });
+
+  const compareProducts = $derived(
+    compareIds
+      .map((id) => allProducts.find((p) => p.id === id))
+      .filter((p): p is Product => p != null),
+  );
+
+  const comparePair = $derived(
+    compareProducts.length === 2 ? ([compareProducts[0], compareProducts[1]] as [Product, Product]) : null,
+  );
 
   const bestOverall = $derived(
     results.products.find((p) => p.id === results.bestOverallId) ?? results.products[0],
@@ -54,6 +78,49 @@
     loadError = null;
     isLoadingMore = false;
     sortMode = 'match';
+    compareIds = [];
+    showComparePanel = false;
+    compareHint = null;
+  }
+
+  function toggleCompare(productId: string) {
+    compareHint = null;
+    if (compareIds.includes(productId)) {
+      compareIds = compareIds.filter((id) => id !== productId);
+      if (compareIds.length < 2) showComparePanel = false;
+      return;
+    }
+
+    if (compareIds.length >= MAX_COMPARE_ITEMS) {
+      compareHint = `Compare is limited to ${MAX_COMPARE_ITEMS} products — remove one to add another.`;
+      return;
+    }
+
+    compareIds = [...compareIds, productId];
+    if (compareIds.length === MAX_COMPARE_ITEMS) {
+      showComparePanel = true;
+    }
+  }
+
+  function isCompareSelected(productId: string): boolean {
+    return compareIds.includes(productId);
+  }
+
+  function isCompareDisabled(productId: string): boolean {
+    return (
+      compareIds.length >= MAX_COMPARE_ITEMS && !compareIds.includes(productId)
+    );
+  }
+
+  function removeFromCompare(productId: string) {
+    compareIds = compareIds.filter((id) => id !== productId);
+    if (compareIds.length < MAX_COMPARE_ITEMS) showComparePanel = false;
+  }
+
+  function clearCompare() {
+    compareIds = [];
+    showComparePanel = false;
+    compareHint = null;
   }
 
   $effect(() => {
@@ -161,7 +228,52 @@
         </button>
       </div>
     {/if}
+
+    {#if totalShown >= 2}
+      <p class="mt-3 text-[11px] text-text-muted">
+        Tap <span class="font-semibold text-pink">Compare</span> on any 2 products — quick verdict, not a spec table.
+      </p>
+    {/if}
   </div>
+
+  {#if compareIds.length > 0}
+    <div class="glass-panel flex flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-3 ring-1 ring-pink/25">
+      <p class="text-xs text-text-muted">
+        <span class="font-bold text-pink">{compareIds.length}/{MAX_COMPARE_ITEMS}</span> selected for compare
+      </p>
+      <div class="flex flex-wrap gap-2">
+        {#if compareIds.length === MAX_COMPARE_ITEMS && !showComparePanel}
+          <button
+            type="button"
+            class="btn-neon rounded-lg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-white"
+            onclick={() => (showComparePanel = true)}
+          >
+            View compare
+          </button>
+        {/if}
+        <button
+          type="button"
+          class="rounded-lg border border-white/10 px-3 py-1.5 text-[11px] font-semibold text-text-subtle hover:text-text"
+          onclick={clearCompare}
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+  {/if}
+
+  {#if compareHint}
+    <p class="text-center text-xs text-amber-300/90">{compareHint}</p>
+  {/if}
+
+  {#if showComparePanel && comparePair}
+    <CompareInsightPanel
+      products={comparePair}
+      {budgetMax}
+      onclose={() => (showComparePanel = false)}
+      onremove={removeFromCompare}
+    />
+  {/if}
 
   {#if totalShown === 0 && !isRefining}
     <div class="glass-panel neon-border rounded-2xl px-5 py-8 text-center">
@@ -177,8 +289,19 @@
         label="Best Overall Match"
         variant="overall"
         {budgetMax}
+        compareSelected={isCompareSelected(bestOverall.id)}
+        compareDisabled={isCompareDisabled(bestOverall.id)}
+        oncomparetoggle={() => toggleCompare(bestOverall.id)}
       />
-      <HighlightCard product={bestValue} label="Best Value Pick" variant="value" {budgetMax} />
+      <HighlightCard
+        product={bestValue}
+        label="Best Value Pick"
+        variant="value"
+        {budgetMax}
+        compareSelected={isCompareSelected(bestValue.id)}
+        compareDisabled={isCompareDisabled(bestValue.id)}
+        oncomparetoggle={() => toggleCompare(bestValue.id)}
+      />
     </div>
   {/if}
 
@@ -190,7 +313,13 @@
 
   <div class="grid grid-cols-2 gap-3 sm:gap-4">
     {#each sortedGridProducts as product (product.id)}
-      <ProductCard {product} {budgetMax} />
+      <ProductCard
+        {product}
+        {budgetMax}
+        compareSelected={isCompareSelected(product.id)}
+        compareDisabled={isCompareDisabled(product.id)}
+        oncomparetoggle={() => toggleCompare(product.id)}
+      />
     {/each}
   </div>
 
