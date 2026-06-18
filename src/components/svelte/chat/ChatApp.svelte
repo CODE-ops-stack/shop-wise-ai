@@ -2,6 +2,7 @@
   import PreferencePanel from '../preferences/PreferencePanel.svelte';
   import ProductResultsBlock from '../products/ProductResultsBlock.svelte';
   import AppFooter from '../ui/AppFooter.svelte';
+  import StoreMarquee from '../ui/StoreMarquee.svelte';
   import ProductSearchSkeleton from '../products/ProductSearchSkeleton.svelte';
   import { EXAMPLE_PROMPTS, TRUST_FEATURES } from '../../../../config/site';
   import { getRecentSearches, saveRecentSearch } from '../../../lib/ui/recent-searches';
@@ -380,7 +381,7 @@
 
 <div class="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col px-4 pb-6 pt-5 sm:px-6">
   <!-- Header -->
-  <header class="glass-panel-elevated neon-border scan-line mb-5 rounded-2xl px-5 py-4 animate-fashion-pop">
+  <header class="glass-luxe neon-border scan-line mb-5 rounded-2xl px-5 py-4 animate-fashion-pop">
     <div class="flex items-center gap-3">
       <div
         class="logo-burst flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-pink via-magenta to-violet pink-glow animate-glow-pulse animate-float"
@@ -405,9 +406,9 @@
         </button>
       {/if}
     </div>
-    <p class="mt-2.5 text-xs leading-relaxed text-text-muted">
-      <span class="text-cyan/80">Next-gen</span> shopping · Myntra · AJIO · Nykaa Fashion · Amazon · Flipkart
-    </p>
+    <div class="mt-3">
+      <StoreMarquee />
+    </div>
   </header>
 
   <!-- Messages -->
@@ -424,8 +425,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <p class="font-display text-lg font-semibold text-gradient-neon">What are you shopping for?</p>
+        <p class="font-display text-xl font-bold text-gradient-neon sm:text-2xl">What are you shopping for?</p>
         <p class="mt-2 text-sm text-text-muted">Tap a suggestion or type your own query</p>
+        <div class="mt-4 flex flex-wrap justify-center gap-2">
+          <span class="hero-stat-pill rounded-full bg-pink/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-pink ring-1 ring-pink/30">AI picks</span>
+          <span class="hero-stat-pill rounded-full bg-violet/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-violet ring-1 ring-violet/30">Exact links</span>
+          <span class="hero-stat-pill rounded-full bg-cyan/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-cyan ring-1 ring-cyan/30">5 stores</span>
+        </div>
+        <div class="holographic-line mx-auto mt-5 max-w-xs"></div>
 
         <div class="mt-5 flex flex-wrap justify-center gap-2">
           {#each EXAMPLE_PROMPTS as prompt, i}
@@ -490,8 +497,8 @@
           <div
             class="max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed
               {message.role === 'user'
-              ? 'bg-gradient-to-br from-pink via-magenta to-violet text-white shadow-lg shadow-pink/30 neon-glow'
-              : 'glass-panel border-cyan/15 text-text-muted'}"
+              ? 'user-bubble-luxe text-white shadow-lg shadow-pink/30 neon-glow'
+              : 'glass-luxe border-cyan/15 text-text-muted'}"
           >
             {message.content}
           </div>
@@ -523,7 +530,7 @@
           </div>
         </div>
       {:else if message.type === 'product_results'}
-        <div class="animate-slide-up flex justify-start">
+        <div class="cinema-reveal flex justify-start">
           <div class="w-full">
             <ProductResultsBlock
               results={message.results}
@@ -570,7 +577,7 @@
   </div>
 
   <!-- Input -->
-  <div class="glass-panel-elevated neon-border sticky bottom-4 rounded-2xl p-3 sm:bottom-6" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
+  <div class="input-luxe glass-luxe neon-border sticky bottom-4 rounded-2xl p-3 sm:bottom-6" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
     <div class="flex items-end gap-2">
       <textarea
         bind:this={textareaEl}

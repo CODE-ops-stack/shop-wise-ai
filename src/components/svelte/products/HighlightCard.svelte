@@ -45,7 +45,7 @@
 </script>
 
 <article
-  class="fashion-card glass-panel-elevated neon-border scan-line rounded-2xl p-4 ring-1 {borderGlow} {compareSelected
+  class="fashion-card tilt-card glass-luxe neon-border scan-line rounded-2xl p-4 ring-1 {borderGlow} {compareSelected
     ? 'ring-2 ring-pink/50 animate-glow-pulse'
     : ''}"
 >

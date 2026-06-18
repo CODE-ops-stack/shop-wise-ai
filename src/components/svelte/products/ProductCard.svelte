@@ -29,7 +29,7 @@
 </script>
 
 <article
-  class="group fashion-card glass-panel neon-border flex flex-col rounded-2xl p-3 {compareSelected
+  class="group fashion-card tilt-card glass-luxe neon-border flex flex-col rounded-2xl p-3 {compareSelected
     ? 'ring-2 ring-pink/50 animate-glow-pulse'
     : ''}"
 >

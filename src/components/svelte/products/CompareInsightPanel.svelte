@@ -31,7 +31,7 @@
   }
 </script>
 
-<section class="glass-panel-elevated neon-border scan-line animate-fashion-pop rounded-2xl p-4 sm:p-5">
+<section class="glass-luxe neon-border scan-line cinema-reveal rounded-2xl p-4 sm:p-5">
   <div class="mb-4 flex items-start justify-between gap-3">
     <div>
       <p class="font-display text-[11px] font-bold uppercase tracking-[0.2em] text-gradient-neon">

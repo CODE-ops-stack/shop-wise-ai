@@ -71,7 +71,7 @@
   }
 </script>
 
-<div class="glass-panel-elevated neon-border scan-line rounded-2xl p-5">
+<div class="glass-luxe neon-border scan-line animate-fashion-pop rounded-2xl p-5">
   <div class="mb-5 border-b border-pink/10 pb-4">
     <h3 class="font-display text-base font-semibold text-text">{panel.title}</h3>
     {#if panel.subtitle}

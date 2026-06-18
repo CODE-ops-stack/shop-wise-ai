@@ -186,7 +186,7 @@
 </script>
 
 <section class="w-full space-y-4">
-  <div class="glass-panel-elevated neon-border scan-line rounded-2xl px-5 py-4">
+  <div class="glass-luxe neon-border scan-line cinema-reveal rounded-2xl px-5 py-4">
     <div class="flex flex-wrap items-baseline justify-between gap-2">
       <p class="font-display text-base font-bold text-text">
         <span class="text-gradient-neon">{totalShown}</span>
