@@ -317,7 +317,7 @@
 
   <div class="grid grid-cols-2 gap-3 sm:gap-4">
     {#each sortedGridProducts as product, i (product.id)}
-      <div class="animate-fashion-pop" style="animation-delay: {i * 60}ms">
+      <div class="reveal-scroll animate-fashion-pop" style="animation-delay: {i * 60}ms">
         <ProductCard
           {product}
           {budgetMax}

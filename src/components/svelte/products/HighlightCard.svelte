@@ -45,7 +45,7 @@
 </script>
 
 <article
-  class="fashion-card tilt-card glass-luxe neon-border scan-line rounded-2xl p-4 ring-1 {borderGlow} {compareSelected
+  class="holo-card fashion-card tilt-card glass-luxe scan-line rounded-2xl p-4 ring-1 {borderGlow} {variant === 'overall' ? 'hot-pick' : ''} {compareSelected
     ? 'ring-2 ring-pink/50 animate-glow-pulse'
     : ''}"
 >
@@ -86,7 +86,7 @@
   <h3 class="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-text">{product.title}</h3>
 
   <div class="mt-2 flex flex-wrap items-baseline gap-2">
-    <span class="text-xl font-bold text-text">{formatInr(product.price)}</span>
+    <span class="price-pop text-xl font-bold text-text">{formatInr(product.price)}</span>
     {#if product.originalPrice}
       <span class="text-sm text-text-subtle line-through">{formatInr(product.originalPrice)}</span>
     {/if}
@@ -128,7 +128,7 @@
     href={product.url}
     target="_blank"
     rel="noopener noreferrer"
-    class="btn-neon mt-4 flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-wide text-white"
+    class="cta-purchase ripple-click mt-4 flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-wide text-white"
   >
     Open exact product on {marketplace.label}
     <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

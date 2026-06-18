@@ -12,7 +12,7 @@
   type="button"
   class="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold transition
     {selected
-    ? 'bg-pink/25 text-pink ring-1 ring-pink/50'
+    ? 'chip-neon-active bg-pink/25 text-pink ring-1 ring-pink/50 animate-bounce-in'
     : 'bg-ink/70 text-text-muted ring-1 ring-white/15 hover:bg-violet/20 hover:text-text'}
     {disabled ? 'cursor-not-allowed opacity-40' : ''}"
   {disabled}

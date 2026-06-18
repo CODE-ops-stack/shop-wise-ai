@@ -434,11 +434,13 @@
         </div>
         <div class="holographic-line mx-auto mt-5 max-w-xs"></div>
 
-        <div class="mt-5 flex flex-wrap justify-center gap-2">
+        <div class="bento-grid mt-5">
           {#each EXAMPLE_PROMPTS as prompt, i}
             <button
               type="button"
-              class="fashion-chip card-hover-lift rounded-full border border-white/10 bg-surface/60 px-3.5 py-2 text-left text-xs font-medium text-text-muted transition hover:border-pink/40 hover:bg-pink/10 hover:text-text animate-slide-up"
+              class="bento-cell fashion-chip holo-card glass-luxe border border-white/10 font-medium text-text-muted transition hover:border-pink/40 hover:text-text animate-slide-up {i === 0
+                ? 'bento-wide'
+                : ''}"
               style="animation-delay: {120 + i * 70}ms"
               onclick={() => useExamplePrompt(prompt)}
             >

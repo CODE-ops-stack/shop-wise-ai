@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/* Modern CSS: animatable custom properties (Chrome, Safari, Firefox 128+) */
+@property --holo-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --mesh-shift {
+  syntax: "<percentage>";
+  initial-value: 0%;
+  inherits: false;
+}
+
+@property --glow-intensity {
+  syntax: "<number>";
+  initial-value: 0.4;
+  inherits: false;
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -10,13 +29,13 @@
   --color-surface-elevated: #1a1a26;
   --color-surface-hover: #22222f;
 
-  --color-pink: #ff2d92;
-  --color-pink-deep: #e91e63;
-  --color-pink-glow: #ff5cad;
-  --color-pink-neon: #ff69c8;
-  --color-magenta: #d946ef;
-  --color-violet: #8b5cf6;
-  --color-cyan: #22d3ee;
+  --color-pink: oklch(0.68 0.26 350);
+  --color-pink-deep: oklch(0.58 0.24 355);
+  --color-pink-glow: oklch(0.72 0.22 345);
+  --color-pink-neon: oklch(0.75 0.24 342);
+  --color-magenta: oklch(0.65 0.28 310);
+  --color-violet: oklch(0.58 0.22 285);
+  --color-cyan: oklch(0.78 0.15 195);
 
   --color-text: #f8fafc;
   --color-text-muted: #94a3b8;
@@ -676,6 +695,177 @@
     opacity: 0.7;
   }
 
+  /* Animated mesh — @property driven */
+  .mesh-animated {
+    position: fixed;
+    inset: -20%;
+    z-index: 0;
+    background:
+      radial-gradient(
+        ellipse 50% 40% at calc(30% + var(--mesh-shift)) 20%,
+        oklch(0.65 0.28 350 / 0.2),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 45% 35% at calc(70% - var(--mesh-shift)) 75%,
+        oklch(0.58 0.22 285 / 0.18),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 40% 30% at 50% 50%,
+        oklch(0.78 0.15 195 / 0.1),
+        transparent 45%
+      );
+    animation: mesh-flow 12s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  /* Film grain — luxury fashion texture */
+  .film-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.045;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+
+  /* Iridescent holographic border — @property --holo-angle */
+  .holo-card {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .holo-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--holo-angle),
+      oklch(0.68 0.26 350),
+      oklch(0.78 0.15 195),
+      oklch(0.58 0.22 285),
+      oklch(0.72 0.24 342),
+      oklch(0.68 0.26 350)
+    );
+    animation: holo-spin 4s linear infinite;
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  /* Scroll-driven reveal (modern browsers) */
+  @supports (animation-timeline: view()) {
+    .reveal-scroll {
+      animation: reveal-scroll linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 28%;
+    }
+  }
+
+  /* Addictive purchase CTA */
+  .cta-purchase {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+      135deg,
+      oklch(0.68 0.26 350),
+      oklch(0.58 0.22 285) 50%,
+      oklch(0.65 0.28 310)
+    );
+    background-size: 200% 200%;
+    animation: cta-breathe 2.8s ease-in-out infinite, cta-gradient 6s ease infinite;
+    box-shadow:
+      0 0 20px oklch(0.68 0.26 350 / 0.45),
+      0 4px 16px rgb(0 0 0 / 0.35);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .cta-purchase::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgb(255 255 255 / 0.35) 50%,
+      transparent 60%
+    );
+    transform: translateX(-100%);
+    animation: cta-shine 3s ease-in-out infinite;
+  }
+
+  .cta-purchase:hover {
+    transform: scale(1.04);
+    box-shadow:
+      0 0 36px oklch(0.68 0.26 350 / 0.65),
+      0 0 72px oklch(0.58 0.22 285 / 0.25);
+  }
+
+  .cta-purchase:active {
+    transform: scale(0.96);
+  }
+
+  /* Ripple on tap */
+  .ripple-click {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Deal flash — urgency */
+  .deal-flash {
+    animation: deal-flash 2s ease-in-out infinite;
+  }
+
+  /* Hot pick urgency ring */
+  .hot-pick {
+    animation: hot-pick-pulse 2.2s ease-in-out infinite;
+  }
+
+  /* Bento hero grid */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    text-align: left;
+  }
+
+  .bento-wide {
+    grid-column: span 2;
+  }
+
+  .bento-cell {
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    transition: all 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
+
+  .bento-cell:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 28px oklch(0.68 0.26 350 / 0.3);
+  }
+
+  .visual-glow {
+    mix-blend-mode: screen;
+  }
+
+  .price-pop {
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 24px oklch(0.78 0.15 195 / 0.35);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .fashion-ambient,
     .fashion-orb,
@@ -696,12 +886,19 @@
     .user-bubble-luxe,
     .input-luxe::before,
     .skeleton-shimmer,
-    .holographic-line {
+    .holographic-line,
+    .mesh-animated,
+    .holo-card::before,
+    .cta-purchase,
+    .cta-purchase::before,
+    .deal-flash,
+    .hot-pick {
       animation: none !important;
     }
 
     .fashion-card:hover,
-    .tilt-card:hover {
+    .tilt-card:hover,
+    .cta-purchase:hover {
       transform: none;
     }
   }
@@ -971,5 +1168,93 @@
   }
   100% {
     background-position: -200% 0;
+  }
+}
+
+@keyframes holo-spin {
+  to {
+    --holo-angle: 360deg;
+  }
+}
+
+@keyframes mesh-flow {
+  0% {
+    --mesh-shift: 0%;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    --mesh-shift: 12%;
+    transform: scale(1.05) rotate(2deg);
+  }
+}
+
+@keyframes reveal-scroll {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.94);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes cta-breathe {
+  0%,
+  100% {
+    --glow-intensity: 0.4;
+    box-shadow:
+      0 0 calc(20px * var(--glow-intensity)) oklch(0.68 0.26 350 / 0.5),
+      0 4px 16px rgb(0 0 0 / 0.35);
+  }
+  50% {
+    --glow-intensity: 0.85;
+    box-shadow:
+      0 0 calc(40px * var(--glow-intensity)) oklch(0.68 0.26 350 / 0.55),
+      0 0 80px oklch(0.58 0.22 285 / 0.2);
+  }
+}
+
+@keyframes cta-gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes cta-shine {
+  0%,
+  100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes deal-flash {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes hot-pick-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.68 0.26 350 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px oklch(0.68 0.26 350 / 0);
   }
 }

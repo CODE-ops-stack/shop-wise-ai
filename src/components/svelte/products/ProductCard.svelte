@@ -29,9 +29,9 @@
 </script>
 
 <article
-  class="group fashion-card tilt-card glass-luxe neon-border flex flex-col rounded-2xl p-3 {compareSelected
-    ? 'ring-2 ring-pink/50 animate-glow-pulse'
-    : ''}"
+  class="group fashion-card tilt-card glass-luxe neon-border flex flex-col rounded-2xl p-3 {product.isBestOverall || product.isBestValue
+    ? 'hot-pick'
+    : ''} {compareSelected ? 'ring-2 ring-pink/50 animate-glow-pulse' : ''}"
 >
   <div class="relative">
     <ProductImage
@@ -73,7 +73,7 @@
   </h3>
 
   <div class="mt-2 flex flex-wrap items-baseline gap-2">
-    <span class="text-base font-bold text-text">{formatInr(product.price)}</span>
+    <span class="price-pop text-base font-bold text-text">{formatInr(product.price)}</span>
     {#if product.originalPrice}
       <span class="text-xs text-text-subtle line-through">{formatInr(product.originalPrice)}</span>
     {/if}
@@ -103,7 +103,7 @@
     href={product.url}
     target="_blank"
     rel="noopener noreferrer"
-    class="mt-auto mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-elevated px-3 py-2.5 text-center text-xs font-semibold text-text ring-1 ring-white/10 transition group-hover:bg-gradient-to-r group-hover:from-pink group-hover:to-violet group-hover:text-white group-hover:ring-pink/50 group-hover:shadow-lg group-hover:shadow-pink/20"
+    class="cta-purchase ripple-click mt-auto mt-3 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-center text-xs font-bold text-white"
   >
     Open on {marketplace.label}
     <svg class="h-3 w-3 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
