@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://docs.astro.build/en/guides/deploy/vercel/
 export default defineConfig({
+  site: 'https://shop-wise-ai.vercel.app',
   output: 'server',
   adapter: vercel({
     maxDuration: 60,

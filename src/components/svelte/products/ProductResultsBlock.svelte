@@ -113,9 +113,22 @@
     <p class="mt-1 text-xs text-text-subtle">
       Ranked: exact match → best price → Myntra, AJIO, Nykaa Fashion, Amazon, Flipkart
     </p>
+    <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-cyan/10 px-2.5 py-1 text-[10px] font-semibold text-cyan/90 ring-1 ring-cyan/20">
+      <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+      Verified exact product page links
+    </p>
   </div>
 
-  {#if bestOverall && bestValue && results.bestOverallId}
+  {#if totalShown === 0 && !isRefining}
+    <div class="glass-panel neon-border rounded-2xl px-5 py-8 text-center">
+      <p class="font-display text-sm font-semibold text-text">No exact matches yet</p>
+      <p class="mt-2 text-xs leading-relaxed text-text-muted">
+        Try widening your budget, changing size or color, or describing the product differently.
+      </p>
+    </div>
+  {:else if bestOverall && bestValue && results.bestOverallId}
     <div class="grid gap-4 sm:grid-cols-2">
       <HighlightCard product={bestOverall} label="Best Overall Match" variant="overall" />
       <HighlightCard product={bestValue} label="Best Value Pick" variant="value" />

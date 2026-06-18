@@ -1,6 +1,8 @@
 <script lang="ts">
   import PreferencePanel from '../preferences/PreferencePanel.svelte';
   import ProductResultsBlock from '../products/ProductResultsBlock.svelte';
+  import AppFooter from '../ui/AppFooter.svelte';
+  import { EXAMPLE_PROMPTS, TRUST_FEATURES } from '../../../../config/site';
   import { analyzeQuery, panelSummary, resolvePreferences } from '../../../lib/preferences/analyzer';
   import type { AnalyzeResponse, SearchErrorResponse, SearchResponse } from '../../../types/api';
   import type { ChatMessage } from '../../../types/chat';
@@ -15,6 +17,7 @@
   let isEnhancing = $state(false);
   let isSearching = $state(false);
   let refiningMessageId = $state<string | null>(null);
+  let messagesContainer = $state<HTMLDivElement | null>(null);
 
   const hasPendingPanel = $derived(
     messages.some((m) => m.type === 'preference_panel' && m.status === 'pending'),
@@ -211,30 +214,62 @@
     void showProductResults(merged, { replaceMessageId: messageId });
   }
 
-  async function handleSubmit() {
-    const query = input.trim();
-    if (!query || isAnalyzing || hasPendingPanel) return;
+  async function submitQuery(query: string) {
+    const trimmed = query.trim();
+    if (!trimmed || isAnalyzing || hasPendingPanel || isSearching) return;
 
     const userMessage: ChatMessage = {
       id: createMessageId(),
       role: 'user',
       type: 'text',
-      content: query,
+      content: trimmed,
       timestamp: Date.now(),
     };
 
     messages = [...messages, userMessage];
-    input = '';
     isAnalyzing = true;
 
     try {
-      const localAnalysis = analyzeQuery(query);
-      applyAnalysis(query, localAnalysis);
-      void fetchEnhancedAnalysis(query, localAnalysis);
+      const localAnalysis = analyzeQuery(trimmed);
+      applyAnalysis(trimmed, localAnalysis);
+      void fetchEnhancedAnalysis(trimmed, localAnalysis);
     } finally {
       isAnalyzing = false;
     }
   }
+
+  async function handleSubmit() {
+    const query = input.trim();
+    if (!query || isAnalyzing || hasPendingPanel || isSearching) return;
+    input = '';
+    await submitQuery(query);
+  }
+
+  function useExamplePrompt(prompt: string) {
+    if (isAnalyzing || hasPendingPanel || isSearching) return;
+    void submitQuery(prompt);
+  }
+
+  function startNewChat() {
+    messages = [];
+    input = '';
+    isAnalyzing = false;
+    isEnhancing = false;
+    isSearching = false;
+    refiningMessageId = null;
+  }
+
+  $effect(() => {
+    void messages.length;
+    void isAnalyzing;
+    void isEnhancing;
+    void isSearching;
+    const el = messagesContainer;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    });
+  });
 
   function handlePreferenceSubmit(messageId: string, selections: FilledSlots) {
     const panelMessage = messages.find(
@@ -327,6 +362,15 @@
           Find the right product, <span class="text-gradient-neon">fast</span>
         </h1>
       </div>
+      {#if messages.length > 0}
+        <button
+          type="button"
+          class="shrink-0 rounded-xl border border-white/10 bg-surface/80 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-muted transition hover:border-pink/40 hover:text-pink"
+          onclick={startNewChat}
+        >
+          New chat
+        </button>
+      {/if}
     </div>
     <p class="mt-2.5 text-xs leading-relaxed text-text-muted">
       <span class="text-cyan/80">Next-gen</span> shopping · Myntra · AJIO · Nykaa Fashion · Amazon · Flipkart
@@ -334,22 +378,56 @@
   </header>
 
   <!-- Messages -->
-  <div class="flex-1 space-y-4 overflow-y-auto pb-4">
+  <div
+    bind:this={messagesContainer}
+    class="flex-1 space-y-4 overflow-y-auto pb-4 scroll-smooth"
+  >
     {#if messages.length === 0}
       <div
-        class="glass-panel neon-border card-hover-lift rounded-2xl border-dashed border-pink/25 p-8 text-center animate-slide-up"
+        class="glass-panel neon-border card-hover-lift rounded-2xl border-dashed border-pink/25 p-6 sm:p-8 text-center animate-slide-up"
       >
         <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink/20 to-violet/20 ring-1 ring-pink/30 neon-glow animate-float">
           <svg class="h-7 w-7 text-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </div>
-        <p class="font-display text-base font-semibold text-gradient-neon">What are you shopping for?</p>
-        <p class="mt-2 text-sm text-text-muted">Start with something like</p>
-        <p class="mt-2 text-sm font-medium text-text">
-          "Black cotton kurta for men under ₹1500"
-        </p>
-        <p class="mt-1 text-xs text-text-subtle">or "kurta pyjama set women in 500"</p>
+        <p class="font-display text-lg font-semibold text-gradient-neon">What are you shopping for?</p>
+        <p class="mt-2 text-sm text-text-muted">Tap a suggestion or type your own query</p>
+
+        <div class="mt-5 flex flex-wrap justify-center gap-2">
+          {#each EXAMPLE_PROMPTS as prompt}
+            <button
+              type="button"
+              class="card-hover-lift rounded-full border border-white/10 bg-surface/60 px-3.5 py-2 text-left text-xs font-medium text-text-muted transition hover:border-pink/40 hover:bg-pink/10 hover:text-text"
+              onclick={() => useExamplePrompt(prompt)}
+            >
+              {prompt}
+            </button>
+          {/each}
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+          {#each TRUST_FEATURES as feature}
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-subtle ring-1 ring-white/8"
+            >
+              {#if feature.icon === 'link'}
+                <svg class="h-3 w-3 text-cyan" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+              {:else if feature.icon === 'spark'}
+                <svg class="h-3 w-3 text-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              {:else}
+                <svg class="h-3 w-3 text-violet" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              {/if}
+              {feature.label}
+            </span>
+          {/each}
+        </div>
       </div>
     {/if}
 
@@ -440,7 +518,7 @@
   </div>
 
   <!-- Input -->
-  <div class="glass-panel-elevated neon-border sticky bottom-4 rounded-2xl p-3 sm:bottom-6">
+  <div class="glass-panel-elevated neon-border sticky bottom-4 rounded-2xl p-3 sm:bottom-6" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
     <div class="flex items-end gap-2">
       <textarea
         class="min-h-[48px] flex-1 resize-none rounded-xl border border-white/8 bg-surface/80 px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-subtle focus:border-pink/50 focus:ring-2 focus:ring-pink/25 disabled:opacity-50"
@@ -449,15 +527,24 @@
         bind:value={input}
         disabled={isAnalyzing || hasPendingPanel || isSearching}
         onkeydown={onKeydown}
+        aria-label="Shopping query"
       ></textarea>
       <button
         type="button"
         class="btn-neon rounded-xl px-5 py-3 text-sm font-bold uppercase tracking-wide text-white disabled:cursor-not-allowed disabled:opacity-40"
         disabled={!input.trim() || isAnalyzing || hasPendingPanel || isSearching}
         onclick={handleSubmit}
+        aria-label="Send message"
       >
         Send
       </button>
     </div>
+    <p class="mt-2 text-center text-[10px] text-text-subtle">
+      <kbd class="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">Enter</kbd> to send
+      <span class="mx-1 text-white/20">·</span>
+      <kbd class="rounded bg-white/5 px-1.5 py-0.5 font-mono text-[9px]">Shift+Enter</kbd> new line
+    </p>
   </div>
+
+  <AppFooter />
 </div>

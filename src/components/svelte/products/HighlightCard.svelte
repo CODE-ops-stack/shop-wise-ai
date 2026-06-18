@@ -1,6 +1,8 @@
 <script lang="ts">
   import { getMarketplace } from '../../../../config/marketplaces';
   import type { Product } from '../../../types/products';
+  import { formatInr, savingsInr } from '../../../lib/ui/format';
+  import DiscountBadge from '../ui/DiscountBadge.svelte';
   import ProductImage from './ProductImage.svelte';
 
   interface Props {
@@ -23,13 +25,7 @@
     variant === 'overall' ? 'ring-pink/30 neon-glow-strong' : 'ring-amber-500/20',
   );
 
-  function formatPrice(price: number): string {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(price);
-  }
+  const saved = $derived(savingsInr(product.price, product.originalPrice));
 </script>
 
 <article
@@ -44,20 +40,30 @@
     <span class="text-xs font-medium text-text-subtle">{marketplace.label}</span>
   </div>
 
-  <ProductImage
-    title={product.title}
-    imageUrl={product.imageUrl}
-    productUrl={product.url}
-    marketplaceLabel={marketplace.label}
-    tall
-  />
+  <div class="relative">
+    <ProductImage
+      title={product.title}
+      imageUrl={product.imageUrl}
+      productUrl={product.url}
+      marketplaceLabel={marketplace.label}
+      tall
+    />
+    {#if product.originalPrice}
+      <div class="absolute left-2 top-2">
+        <DiscountBadge price={product.price} originalPrice={product.originalPrice} size="md" />
+      </div>
+    {/if}
+  </div>
 
   <h3 class="mt-3 line-clamp-2 text-sm font-semibold leading-snug text-text">{product.title}</h3>
 
-  <div class="mt-2 flex items-baseline gap-2">
-    <span class="text-xl font-bold text-text">{formatPrice(product.price)}</span>
+  <div class="mt-2 flex flex-wrap items-baseline gap-2">
+    <span class="text-xl font-bold text-text">{formatInr(product.price)}</span>
     {#if product.originalPrice}
-      <span class="text-sm text-text-subtle line-through">{formatPrice(product.originalPrice)}</span>
+      <span class="text-sm text-text-subtle line-through">{formatInr(product.originalPrice)}</span>
+    {/if}
+    {#if saved}
+      <span class="text-xs font-medium text-emerald-400">Save {formatInr(saved)}</span>
     {/if}
   </div>
 
@@ -84,8 +90,11 @@
     href={product.url}
     target="_blank"
     rel="noopener noreferrer"
-    class="btn-neon mt-4 block rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-wide text-white"
+    class="btn-neon mt-4 flex items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-center text-xs font-bold uppercase tracking-wide text-white"
   >
     Open exact product on {marketplace.label}
+    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
   </a>
 </article>

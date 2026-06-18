@@ -1,0 +1,18 @@
+{
+  "name": "ShopWise AI",
+  "short_name": "ShopWise",
+  "description": "AI shopping assistant for India — exact product links across top stores.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#050508",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
