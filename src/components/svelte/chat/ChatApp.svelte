@@ -270,6 +270,17 @@
     recentSearches = getRecentSearches();
   });
 
+  function prefersInstantScroll(): boolean {
+    if (typeof window === 'undefined') return true;
+    return window.matchMedia(
+      '(max-width: 767px), (hover: none), (prefers-reduced-motion: reduce)',
+    ).matches;
+  }
+
+  function isNearBottom(el: HTMLElement, threshold = 140): boolean {
+    return el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+  }
+
   $effect(() => {
     void messages.length;
     void isAnalyzing;
@@ -278,7 +289,9 @@
     const el = messagesContainer;
     if (!el) return;
     requestAnimationFrame(() => {
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      const instant = prefersInstantScroll();
+      if (!instant && !isNearBottom(el)) return;
+      el.scrollTo({ top: el.scrollHeight, behavior: instant ? 'auto' : 'smooth' });
     });
   });
 
@@ -414,7 +427,7 @@
   <!-- Messages -->
   <div
     bind:this={messagesContainer}
-    class="flex-1 space-y-4 overflow-y-auto pb-4 scroll-smooth"
+    class="messages-scroll flex-1 space-y-4 overflow-y-auto overscroll-y-contain pb-4 scroll-smooth"
   >
     {#if messages.length === 0}
       <div

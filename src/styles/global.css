@@ -866,6 +866,100 @@
     text-shadow: 0 0 24px oklch(0.78 0.15 195 / 0.35);
   }
 
+  /* Mobile / touch: keep visuals, drop GPU-heavy effects */
+  @media (max-width: 767px), ((hover: none) and (pointer: coarse)) {
+    .futuristic-bg::before {
+      animation: none;
+      filter: none;
+      transform: none;
+    }
+
+    .film-grain,
+    .mesh-animated,
+    .visual-glow,
+    .fashion-sparkle,
+    .fashion-streak,
+    .fashion-diamond,
+    .fashion-burst-ring,
+    .fashion-orb-3,
+    .fashion-orb-4,
+    .fashion-orb-5 {
+      display: none !important;
+    }
+
+    .fashion-orb {
+      filter: blur(48px);
+      opacity: 0.3;
+      animation: none;
+    }
+
+    .glass-panel,
+    .glass-luxe,
+    .glass-panel-elevated {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: rgb(18 18 26 / 0.92);
+    }
+
+    .glass-luxe {
+      background: rgb(22 22 32 / 0.94);
+    }
+
+    .glass-panel-elevated {
+      background: rgb(26 26 38 / 0.95);
+    }
+
+    .messages-scroll {
+      scroll-behavior: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .fashion-card,
+    .holo-card {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 300px;
+    }
+
+    .reveal-scroll {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+
+    .cinema-reveal {
+      animation: fade-in 0.35s ease-out both;
+    }
+
+    .scan-line::after,
+    .neon-border::before,
+    .holo-card::before,
+    .logo-burst::before,
+    .fashion-hero-burst::before,
+    .input-luxe::before,
+    .holographic-line,
+    .text-gradient-neon,
+    .text-gradient-pink,
+    .user-bubble-luxe,
+    .animate-float,
+    .animate-glow-pulse,
+    .animate-sparkle-spin,
+    .store-marquee-track,
+    .cta-purchase,
+    .cta-purchase::before,
+    .deal-flash,
+    .hot-pick,
+    .hero-stat-pill,
+    .skeleton-shimmer {
+      animation: none !important;
+    }
+
+    .animate-ping {
+      animation: none !important;
+      opacity: 0.5;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .fashion-ambient,
     .fashion-orb,
